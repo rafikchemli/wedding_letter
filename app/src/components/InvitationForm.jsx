@@ -153,7 +153,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
       {/* 3. Accommodation */}
       <Section icon={Home} title="3. Hébergement" delay={0.1}>
         <Field label="Adresse au Canada">
-          <Input value={form.accommodationAddress} onChange={set('accommodationAddress')} disabled />
+          <Input value={form.accommodationAddress} onChange={set('accommodationAddress')} />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Début hébergement (si différent)" helper="Optionnel">
