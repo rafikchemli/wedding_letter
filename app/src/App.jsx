@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate } from 'framer-motion'
 import { Heart, FileText, ChevronRight, ChevronDown } from 'lucide-react'
 import InvitationForm from './components/InvitationForm'
 import LetterPreview from './components/LetterPreview'
@@ -125,7 +125,8 @@ function PhotoGallery() {
 function ScrollGoldFoil({ children, delay }) {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const backgroundPosition = useTransform(scrollYProgress, [0, 1], ['-200% center', '200% center'])
+  const x = useTransform(scrollYProgress, [0, 1], [-200, 200])
+  const backgroundPosition = useMotionTemplate`${x}% center`
 
   return (
     <motion.p
