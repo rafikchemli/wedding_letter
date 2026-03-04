@@ -1,6 +1,5 @@
-import { useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, FileDown, FileText } from 'lucide-react'
+import { ArrowLeft, FileDown, FileText, Check } from 'lucide-react'
 import { Document, Packer, Paragraph, TextRun } from 'docx'
 import { saveAs } from 'file-saver'
 
@@ -82,17 +81,55 @@ async function downloadPdf(d) {
     .save()
 }
 
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+}
+
 export default function LetterPreview({ data, onBack }) {
   const letterText = generateLetterText(data)
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <motion.div
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
+      {/* Success banner */}
+      <motion.div
+        variants={fadeUp}
+        className="bg-green-50 border border-green-200 rounded-2xl p-5 flex items-start gap-3"
+      >
+        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
+          <Check className="w-4 h-4 text-green-600" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-green-900">Lettre générée avec succès</p>
+          <p className="text-sm text-green-700 mt-0.5">
+            Vérifiez l'aperçu ci-dessous puis téléchargez en DOCX ou PDF.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Actions */}
+      <motion.div
+        variants={fadeUp}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <motion.button
           onClick={onBack}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 bg-transparent border border-gray-200 text-gray-700 rounded-full
+            px-5 py-2.5 text-sm font-medium hover:bg-gray-50
+            focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+            transition-all duration-200 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           Modifier le formulaire
@@ -102,7 +139,10 @@ export default function LetterPreview({ data, onBack }) {
             onClick={() => downloadDocx(data)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-2 bg-blue-500 text-white rounded-full px-5 py-2.5 text-sm font-medium hover:bg-blue-600 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 bg-blue-500 text-white rounded-full px-5 py-2.5 text-sm font-medium
+              hover:bg-blue-600 shadow-sm hover:shadow-md
+              focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+              transition-all duration-200 cursor-pointer"
           >
             <FileText className="w-4 h-4" />
             DOCX
@@ -111,21 +151,23 @@ export default function LetterPreview({ data, onBack }) {
             onClick={() => downloadPdf(data)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-2 bg-gray-900 text-white rounded-full px-5 py-2.5 text-sm font-medium hover:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 bg-gray-900 text-white rounded-full px-5 py-2.5 text-sm font-medium
+              hover:bg-gray-800 shadow-sm hover:shadow-md
+              focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2
+              transition-all duration-200 cursor-pointer"
           >
             <FileDown className="w-4 h-4" />
             PDF
           </motion.button>
         </div>
-      </div>
+      </motion.div>
 
+      {/* Letter preview card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+        variants={fadeUp}
+        className="animated-border bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
       >
-        <div className="bg-gray-50 border-b border-gray-200 px-5 py-3 flex items-center gap-2">
+        <div className="bg-gray-50 border-b border-gray-200 px-6 py-3.5 flex items-center gap-2">
           <FileText className="w-4 h-4 text-gray-400" />
           <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
             Aperçu de la lettre
@@ -133,12 +175,12 @@ export default function LetterPreview({ data, onBack }) {
         </div>
         <div
           id="letter-content"
-          className="p-6 sm:p-10 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap font-serif"
-          style={{ fontFamily: "'Times New Roman', serif" }}
+          className="p-6 sm:p-10 text-sm text-gray-800 leading-relaxed whitespace-pre-wrap"
+          style={{ fontFamily: "'Times New Roman', Georgia, serif", lineHeight: 1.7 }}
         >
           {letterText}
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }

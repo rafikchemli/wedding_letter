@@ -2,11 +2,20 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Plane, Home, RotateCcw, BookOpen, Users, ChevronRight } from 'lucide-react'
 
-const sectionAnim = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-50px' },
-  transition: { duration: 0.5, ease: 'easeOut' },
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.1 },
+  },
+}
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' },
+  },
 }
 
 function Field({ label, required, helper, children }) {
@@ -17,7 +26,7 @@ function Field({ label, required, helper, children }) {
         {required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       {children}
-      {helper && <p className="text-xs text-gray-400 mt-1">{helper}</p>}
+      {helper && <p className="text-xs text-gray-400 mt-1.5">{helper}</p>}
     </div>
   )
 }
@@ -31,26 +40,30 @@ function Input({ value, onChange, placeholder, type = 'text', required, disabled
       placeholder={placeholder}
       required={required}
       disabled={disabled}
-      className="w-full rounded-xl bg-white border border-gray-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none disabled:bg-gray-50 disabled:text-gray-500"
+      className="w-full rounded-xl bg-white border border-gray-200 px-4 py-2.5 text-sm
+        focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
+        focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+        transition-all duration-200 outline-none
+        disabled:opacity-50 disabled:cursor-not-allowed"
       {...rest}
     />
   )
 }
 
-function Section({ icon: Icon, title, children, delay = 0 }) {
+function Section({ icon: Icon, title, children }) {
   return (
     <motion.div
-      {...sectionAnim}
-      transition={{ ...sectionAnim.transition, delay }}
-      className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-7"
+      variants={sectionVariants}
+      className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8
+        hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
     >
-      <div className="flex items-center gap-2.5 mb-5">
-        <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-          <Icon className="w-4.5 h-4.5 text-blue-500" />
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+          <Icon className="w-5 h-5 text-blue-500" />
         </div>
         <h3 className="text-base font-semibold text-gray-900">{title}</h3>
       </div>
-      <div className="space-y-4">{children}</div>
+      <div className="space-y-5">{children}</div>
     </motion.div>
   )
 }
@@ -99,10 +112,17 @@ export default function InvitationForm({ onSubmit, initialData }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <motion.form
+      onSubmit={handleSubmit}
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: '-100px' }}
+      className="space-y-6"
+    >
       {/* 1. Visitor Identity */}
-      <Section icon={User} title="1. Identité du visiteur" delay={0}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Section icon={User} title="1. Identité du visiteur">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="sm:col-span-2">
             <Field label="Nom complet (tel que sur le passeport)" required>
               <Input value={form.fullName} onChange={set('fullName')} placeholder="Jean Dupont" required />
@@ -118,7 +138,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
         <Field label="Adresse résidentielle complète" required>
           <Input value={form.address} onChange={set('address')} placeholder="123 Rue Exemple, Paris, France" required />
         </Field>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Téléphone" required>
             <Input type="tel" value={form.phone} onChange={set('phone')} placeholder="+33 6 12 34 56 78" required />
           </Field>
@@ -129,11 +149,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 2. Travel Details */}
-      <Section icon={Plane} title="2. Détails du voyage" delay={0.05}>
+      <Section icon={Plane} title="2. Détails du voyage">
         <Field label="Motif du voyage">
           <Input value={form.purpose} onChange={set('purpose')} disabled />
         </Field>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <Field label="Date d'arrivée" required>
             <Input type="date" value={form.arrivalDate} onChange={set('arrivalDate')} required />
           </Field>
@@ -150,11 +170,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 3. Accommodation */}
-      <Section icon={Home} title="3. Hébergement" delay={0.1}>
+      <Section icon={Home} title="3. Hébergement">
         <Field label="Adresse au Canada">
           <Input value={form.accommodationAddress} onChange={set('accommodationAddress')} disabled />
         </Field>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Début hébergement (si différent)" helper="Optionnel">
             <Input type="date" value={form.accommodationDatesStart} onChange={set('accommodationDatesStart')} />
           </Field>
@@ -165,8 +185,8 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 4. Return */}
-      <Section icon={RotateCcw} title="4. Retour après la visite" delay={0.15}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Section icon={RotateCcw} title="4. Retour après la visite">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Pays de retour" required>
             <Input value={form.returnCountry} onChange={set('returnCountry')} placeholder="France" required />
           </Field>
@@ -177,8 +197,8 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 5. Passport */}
-      <Section icon={BookOpen} title="5. Passeport (optionnel)" delay={0.2}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Section icon={BookOpen} title="5. Passeport (optionnel)">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Numéro de passeport">
             <Input value={form.passportNumber} onChange={set('passportNumber')} placeholder="AB1234567" />
           </Field>
@@ -189,29 +209,27 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 6. Relationship */}
-      <Section icon={Users} title="6. Lien avec l'hôte" delay={0.25}>
+      <Section icon={Users} title="6. Lien avec l'hôte">
         <Field label="Relation avec Madjdi Rafik Chemli" required>
           <Input value={form.relationship} onChange={set('relationship')} placeholder="Cousin, ami, collègue..." required />
         </Field>
       </Section>
 
       {/* Submit */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="pt-2"
-      >
+      <motion.div variants={sectionVariants} className="pt-4">
         <motion.button
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full sm:w-auto bg-blue-500 text-white rounded-full px-8 py-3 text-sm font-medium hover:bg-blue-600 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+          className="animated-border w-full sm:w-auto bg-blue-500 text-white rounded-full px-8 py-3 text-sm font-medium
+            hover:bg-blue-600 shadow-sm hover:shadow-md
+            focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+            transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
         >
           Générer la lettre
           <ChevronRight className="w-4 h-4" />
         </motion.button>
       </motion.div>
-    </form>
+    </motion.form>
   )
 }
