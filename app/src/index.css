@@ -2,14 +2,13 @@
 
 /* ─── Fonts ─── */
 html {
-  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: 'Lato', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
   background-color: #FDF8F4;
 }
 

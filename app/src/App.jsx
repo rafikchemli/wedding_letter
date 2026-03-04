@@ -72,7 +72,7 @@ function PhotoGallery() {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="py-12 sm:py-16 relative z-10 snap-start"
+      className="py-12 sm:py-16 relative z-10 "
     >
       <OrnamentalDivider className="max-w-xs mx-auto mb-10" />
 
@@ -235,7 +235,7 @@ function App() {
 
       {/* Hero section with photo background */}
       {currentStep === 0 && (
-        <section className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden snap-start">
+        <section className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden ">
           {/* Background photo */}
           <div className="absolute inset-0 z-0">
             <img
