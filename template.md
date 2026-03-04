@@ -34,7 +34,7 @@ Lien avec le visiteur : [ex. cousin / ami / autre].
 
 Détails de ma famille :
 
-Conjointe : Sandrine Martelle, née le 3 février 1995.
+Conjointe : Sandrine Martelle, née le 3 février 1995 à montréal.
 
 Je confirme que les informations ci-dessus sont exactes et fournies à l’appui de la demande de visa visiteur de [Nom du visiteur].
 
