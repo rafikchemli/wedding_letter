@@ -107,6 +107,8 @@ const GROUND_PATHS = {
     'M-50 760 C150 755 350 738 500 722 C620 712 680 710 760 718 C900 730 1050 740 1250 735 L1250 800 L-50 800Z',
   ],
   snow: [
+    // Far distant snowbank — somber, in shadow
+    'M-50 680 C100 670 250 645 400 620 C520 600 600 610 720 630 C850 620 950 600 1080 590 C1160 588 1220 600 1250 610 L1250 800 L-50 800Z',
     // Back snowbank — big soft mounds
     'M-50 700 C50 700 120 660 220 610 C320 560 380 560 440 600 C500 640 560 660 660 620 C760 580 820 560 900 580 C980 600 1020 640 1100 620 C1180 600 1220 580 1250 590 L1250 800 L-50 800Z',
     // Mid snowbank — pillowy bumps, offset
@@ -158,6 +160,23 @@ function HeroSvg({ theme }) {
           <stop offset="50%" stopColor="#D8BC70" />
           <stop offset="100%" stopColor="#E4C888" />
         </linearGradient>
+        {/* Snowbank gradient fills — far=darkest, back=dark, mid=medium, front=bright */}
+        <linearGradient id="snow-far" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#1E2A38" />
+          <stop offset="100%" stopColor="#182230" />
+        </linearGradient>
+        <linearGradient id="snow-back" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#384858" />
+          <stop offset="100%" stopColor="#2A3848" />
+        </linearGradient>
+        <linearGradient id="snow-mid" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#4A6078" />
+          <stop offset="100%" stopColor="#3A5068" />
+        </linearGradient>
+        <linearGradient id="snow-front" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#5A7890" />
+          <stop offset="100%" stopColor="#4A6880" />
+        </linearGradient>
       </defs>
       <rect width="1200" height="800" fill="url(#hero-sky)" />
       <circle cx="600" cy="280" r="180" fill="url(#hero-sun)" />
@@ -186,9 +205,10 @@ function HeroSvg({ theme }) {
       </motion.g>
       {/* Snow ground — static paths, fade in when snow */}
       <motion.g initial={false} animate={{ opacity: isSnow ? 1 : 0 }} transition={fade}>
-        {GROUND_PATHS.snow.map((d, i) => (
-          <path key={i} d={d} fill={THEMES.snow.ground[i].color} fillOpacity={THEMES.snow.ground[i].opacity} />
-        ))}
+        <path d={GROUND_PATHS.snow[0]} fill="url(#snow-far)" fillOpacity="0.9" />
+        <path d={GROUND_PATHS.snow[1]} fill="url(#snow-back)" fillOpacity="0.85" />
+        <path d={GROUND_PATHS.snow[2]} fill="url(#snow-mid)" fillOpacity="0.8" />
+        <path d={GROUND_PATHS.snow[3]} fill="url(#snow-front)" fillOpacity="0.75" />
       </motion.g>
     </svg>
   )
