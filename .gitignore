@@ -1,7 +1,4 @@
 # Playwright screenshots & logs
-*.png
-*.jpg
-*.jpeg
 .playwright-mcp/
 
 # OS
@@ -10,7 +7,3 @@
 # Environment
 .env
 .env.local
-.claude/skills/ui-design-brain/components.md
-.gitignore
-.gitignore
-.claude/skills/ui-design-brain/SKILL.md
