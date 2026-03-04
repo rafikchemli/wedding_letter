@@ -6,46 +6,46 @@ import { saveAs } from 'file-saver'
 function generateLetterText(d) {
   const today = new Date().toISOString().split('T')[0]
   const passportLine = d.passportNumber
-    ? `, passeport no ${d.passportNumber} (delivre par ${d.issuingCountry || '--'})`
+    ? `, passeport no ${d.passportNumber} (délivré par ${d.issuingCountry || '—'})`
     : ''
   const accomDates =
     d.accommodationDatesStart && d.accommodationDatesEnd
-      ? ` (ou du ${d.accommodationDatesStart} au ${d.accommodationDatesEnd} si different)`
+      ? ` (ou du ${d.accommodationDatesStart} au ${d.accommodationDatesEnd} si différent)`
       : ''
 
   return `Madjdi Rafik Chemli
-Adresse : 267 Rachel Est, Montreal (QC), Canada H2W 1E5
-Ville : Montreal
+Adresse : 267 Rachel Est, Montréal (QC), Canada H2W 1E5
+Ville : Montréal
 
 Date : ${today}
 
-A : Immigration, Refugies et Citoyennete Canada (IRCC)
-Objet : Lettre d'invitation -- Demande de visa visiteur pour ${d.fullName}
+À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)
+Objet : Lettre d'invitation — Demande de visa visiteur pour ${d.fullName}
 
-Je soussigne Madjdi Rafik Chemli, ne le 21 juin 1994, citoyen canadien, residant au 267 Rachel Est, Montreal (QC), Canada, invite par la presente ${d.fullName}, ne(e) le ${d.dob}, de nationalite ${d.nationality}, residant au ${d.address}, telephone ${d.phone}, courriel ${d.email}${passportLine}, a venir au Canada pour un sejour temporaire.
+Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994, citoyen canadien, résidant au 267 Rachel Est, Montréal (QC), Canada, invite par la présente ${d.fullName}, né(e) le ${d.dob}, de nationalité ${d.nationality}, résidant au ${d.address}, téléphone ${d.phone}, courriel ${d.email}${passportLine}, à venir au Canada pour un séjour temporaire.
 
-Motif du voyage : assister a mon mariage, prevu le 19 septembre 2026 a Montreal, Quebec.
+Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Quebec.
 
-Dates prevues du sejour : du ${d.arrivalDate} au ${d.departureDate} (duree totale : ${d.duration}).
-Hebergement : ${d.fullName} logera chez moi au 267 Rachel Est, Montreal (QC), Canada, sans frais pour le visiteur, pendant la duree du sejour${accomDates}.
+Dates prévues du séjour : du ${d.arrivalDate} au ${d.departureDate} (durée totale : ${d.duration}).
+Hébergement : ${d.fullName} logera chez moi au 267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur, pendant la durée du séjour${accomDates}.
 
-Dispositions financieres : ${d.fullName} assumera l'ensemble des frais lies a son voyage et a son sejour, incluant notamment le billet d'avion, le transport local, la nourriture, l'assurance voyage et les depenses personnelles.
+Dispositions financières : ${d.fullName} assumera l'ensemble des frais liés à son voyage et à son séjour, incluant notamment le billet d'avion, le transport local, la nourriture, l'assurance voyage et les dépenses personnelles.
 
-Depart du Canada : ${d.fullName} quittera le Canada au plus tard le ${d.departureDate} afin de retourner a ${d.returnCountry}.
+Départ du Canada : ${d.fullName} quittera le Canada au plus tard le ${d.departureDate} afin de retourner à ${d.returnCountry}.
 
 Mes informations professionnelles :
 
 Poste : Senior Data Scientist (EC-05)
-Employeur : Statistique Canada -- CAIRE (Centre of AI Research and Expertise)
-Ville : Montreal
+Employeur : Statistique Canada — CAIRE (Centre of AI Research and Expertise)
+Ville : Montréal
 
 Lien avec le visiteur : ${d.relationship}.
 
-Details de ma famille :
+Détails de ma famille :
 
-Conjointe : Sandrine Martelle, nee le 3 fevrier 1995.
+Conjointe : Sandrine Martelle, née le 3 février 1995.
 
-Je confirme que les informations ci-dessus sont exactes et fournies a l'appui de la demande de visa visiteur de ${d.fullName}.
+Je confirme que les informations ci-dessus sont exactes et fournies à l'appui de la demande de visa visiteur de ${d.fullName}.
 
 Cordialement,
 
@@ -97,9 +97,9 @@ export default function LetterPreview({ data, onBack }) {
           <Check className="w-4 h-4 text-green-600" />
         </div>
         <div>
-          <p className="text-sm font-medium text-green-900">Lettre generee avec succes</p>
+          <p className="text-sm font-medium text-green-900">Lettre générée avec succès</p>
           <p className="text-sm text-green-700 mt-0.5">
-            Verifiez l'apercu ci-dessous puis telechargez en DOCX ou PDF.
+            Vérifiez l'aperçu ci-dessous puis téléchargez en DOCX ou PDF.
           </p>
         </div>
       </motion.div>
@@ -163,7 +163,7 @@ export default function LetterPreview({ data, onBack }) {
         <div className="bg-gray-50 border-b border-gray-200 px-6 py-3.5 flex items-center gap-2">
           <FileText className="w-4 h-4 text-gray-400" />
           <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Apercu de la lettre
+            Aperçu de la lettre
           </span>
         </div>
         <div

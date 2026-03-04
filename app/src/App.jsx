@@ -7,7 +7,7 @@ import './index.css'
 
 const steps = [
   { id: 'form', label: 'Formulaire' },
-  { id: 'preview', label: 'Apercu' },
+  { id: 'preview', label: 'Aperçu' },
 ]
 
 function App() {
@@ -114,10 +114,10 @@ function App() {
                     Lettre d'invitation IRCC
                   </div>
                   <h2 className="text-3xl sm:text-4xl font-semibold text-gray-900 mb-4 leading-[1.2]">
-                    Generez votre lettre d'invitation
+                    Générez votre lettre d'invitation
                   </h2>
                   <p className="text-base text-gray-500 max-w-lg mx-auto leading-relaxed">
-                    Remplissez le formulaire ci-dessous pour generer une lettre officielle
+                    Remplissez le formulaire ci-dessous pour générer une lettre officielle
                     pour votre demande de visa visiteur au Canada.
                   </p>
                 </motion.div>
@@ -134,7 +134,7 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-8 sm:py-10 text-center text-xs text-gray-400">
-        Mariage Rafik & Sandrine — 19 septembre 2026 — Montreal
+        Mariage Rafik & Sandrine — 19 septembre 2026 — Montréal
       </footer>
     </div>
   )
