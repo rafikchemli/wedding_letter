@@ -26,6 +26,47 @@ function FloatingPetals() {
   )
 }
 
+const letterContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+}
+
+const letterChild = {
+  hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.4, ease: 'easeOut' },
+  },
+}
+
+function AnimatedName({ text, delay = 0, className: cls = '' }) {
+  return (
+    <motion.h2
+      variants={letterContainer}
+      initial="hidden"
+      animate="visible"
+      transition={{ delayChildren: delay }}
+      className={cls}
+      aria-label={text}
+    >
+      {text.split('').map((char, i) => (
+        <motion.span
+          key={i}
+          variants={letterChild}
+          className="inline-block"
+          style={{ minWidth: char === ' ' ? '0.25em' : undefined }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </motion.h2>
+  )
+}
+
 function OrnamentalDivider({ className = '' }) {
   return (
     <div className={`ornament text-sm font-display italic tracking-wide ${className}`}>
@@ -195,21 +236,26 @@ function App() {
               Vous êtes invité(e) au mariage de
             </p>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
-            >
-              <h2 className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] mb-2 drop-shadow-sm">
-                Rafik
-              </h2>
-              <div className="ornament text-2xl my-3 text-[#8B9E7E] font-display italic">
+            <div>
+              <AnimatedName
+                text="Rafik"
+                delay={0.4}
+                className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] mb-2 drop-shadow-sm"
+              />
+              <motion.div
+                initial={{ opacity: 0, scaleX: 0 }}
+                animate={{ opacity: 1, scaleX: 1 }}
+                transition={{ duration: 0.6, delay: 0.9, ease: 'easeOut' }}
+                className="ornament text-2xl my-3 text-[#8B9E7E] font-display italic"
+              >
                 &
-              </div>
-              <h2 className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] drop-shadow-sm">
-                Sandrine
-              </h2>
-            </motion.div>
+              </motion.div>
+              <AnimatedName
+                text="Sandrine"
+                delay={1.1}
+                className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] drop-shadow-sm"
+              />
+            </div>
 
             <motion.div
               initial={{ opacity: 0 }}
