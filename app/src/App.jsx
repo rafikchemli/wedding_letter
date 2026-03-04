@@ -189,50 +189,6 @@ function OrnamentalDivider({ className = '' }) {
   )
 }
 
-function PhotoGallery() {
-  return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="py-12 sm:py-16 relative z-10 "
-    >
-      <OrnamentalDivider className="max-w-xs mx-auto mb-10" />
-
-      <div className="flex gap-4 sm:gap-6 justify-center px-4 max-w-4xl mx-auto">
-        {photos.map((photo, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 40, rotate: i === 0 ? -3 : i === 2 ? 3 : 0 }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-              rotate: i === 0 ? -3 : i === 2 ? 3 : 0,
-            }}
-            viewport={{ once: true, margin: '0px 0px -100px 0px' }}
-            transition={{ duration: 0.7, delay: i * 0.2, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
-            className="relative flex-1 max-w-[200px] sm:max-w-[240px] aspect-[3/4] rounded-2xl overflow-hidden
-              shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
-          >
-            <img
-              src={photo.src}
-              alt={photo.alt}
-              loading="lazy"
-              className="w-full h-full object-cover"
-            />
-            {/* Soft overlay at bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-          </motion.div>
-        ))}
-      </div>
-
-      <OrnamentalDivider className="max-w-xs mx-auto mt-10" />
-    </motion.section>
-  )
-}
-
 function ScrollGoldFoil({ children, delay, gradient }) {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
@@ -245,8 +201,9 @@ function ScrollGoldFoil({ children, delay, gradient }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, delay }}
-      className="text-lg font-display font-semibold tracking-wide drop-shadow-sm"
+      className="font-display font-semibold tracking-widest uppercase drop-shadow-sm"
       style={{
+        fontSize: 'clamp(1rem, 0.8rem + 0.6vw, 1.25rem)',
         backgroundImage: gradient,
         backgroundSize: '250% auto',
         backgroundPosition,
@@ -254,7 +211,6 @@ function ScrollGoldFoil({ children, delay, gradient }) {
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
         color: 'transparent',
-        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))',
       }}
     >
       {children}
@@ -319,8 +275,8 @@ function App() {
             <div className="absolute inset-0" style={{ background: t.tint }} />
           </div>
 
-          {/* Top spacer — pushes names to center */}
-          <div className="flex-1" />
+          {/* Top spacer — pushes names to center, shrinks on small screens */}
+          <div className="flex-1 min-h-8 sm:min-h-0" />
 
           {/* Names & date — vertically centered */}
           <motion.div
@@ -333,8 +289,8 @@ function App() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="text-sm uppercase tracking-[0.3em] mb-6 drop-shadow-sm"
-              style={{ color: t.heroSub }}
+              className="uppercase tracking-[0.4em] mb-8 drop-shadow-sm"
+              style={{ color: t.heroSub, fontSize: 'clamp(0.65rem, 0.5rem + 0.4vw, 0.85rem)' }}
             >
               Vous êtes invité(e) au mariage de
             </motion.p>
@@ -343,23 +299,23 @@ function App() {
               <AnimatedName
                 text="Sandrine"
                 delay={1.5}
-                className="text-5xl sm:text-7xl leading-[1.1] mb-2 drop-shadow-sm"
-                style={{ color: t.nameSandrine }}
+                className="leading-[1] mb-2 drop-shadow-sm"
+                style={{ color: t.nameSandrine, fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
               />
               <motion.div
                 initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 1, scaleX: 1 }}
                 transition={{ duration: 0.6, delay: 2.3, ease: 'easeOut' }}
-                className="ornament text-2xl my-3 font-display italic"
-                style={{ color: t.ampersand, '--ornament-line': t.ornamentLine }}
+                className="ornament my-4 font-display italic"
+                style={{ color: t.ampersand, '--ornament-line': t.ornamentLine, fontSize: 'clamp(1.25rem, 1rem + 0.8vw, 1.75rem)' }}
               >
                 &
               </motion.div>
               <AnimatedName
                 text="Rafik"
                 delay={2.7}
-                className="text-5xl sm:text-7xl leading-[1.1] drop-shadow-sm"
-                style={{ color: t.nameRafik }}
+                className="leading-[1] drop-shadow-sm"
+                style={{ color: t.nameRafik, fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
               />
             </div>
 
@@ -367,16 +323,39 @@ function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 3.8 }}
-              className="mt-8 space-y-2"
+              className="mt-12 space-y-2"
             >
               <ScrollGoldFoil delay={3.8} gradient={t.goldGradient}>
                 19 septembre 2026
               </ScrollGoldFoil>
-              <p className="text-sm drop-shadow-sm" style={{ color: t.heroLight }}>
+              <p className="tracking-wider drop-shadow-sm" style={{ color: t.heroLight, fontSize: 'clamp(0.75rem, 0.6rem + 0.4vw, 0.9rem)' }}>
                 Studio L'Éloi — Montréal
               </p>
             </motion.div>
           </motion.div>
+
+          {/* Photos — 1 & 3 appear first, then 2 */}
+          <div className="relative z-10 flex gap-2 sm:gap-5 justify-center px-4 mt-6 sm:mt-8">
+            {photos.map((photo, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: i === 1 ? 5.0 : 4.2, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
+                className="relative w-[28%] max-w-[220px] aspect-[3/4] rounded-xl overflow-hidden shadow-lg"
+                style={{ rotate: i === 0 ? '-3deg' : i === 2 ? '3deg' : '0deg' }}
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              </motion.div>
+            ))}
+          </div>
 
           {/* Bottom spacer — pushes CTA toward bottom */}
           <div className="flex-1" />
@@ -419,10 +398,6 @@ function App() {
         </section>
       )}
 
-      {/* Photo gallery — visible on form step */}
-      {currentStep === 0 && (
-        <PhotoGallery />
-      )}
 
       {/* Main */}
       <main id="form-section" className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
