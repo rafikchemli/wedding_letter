@@ -15,6 +15,4 @@
   <circle cx="600" cy="280" r="180" fill="url(#sun)"/>
   <ellipse cx="600" cy="620" rx="700" ry="200" fill="#8B9E7E" opacity="0.3"/>
   <ellipse cx="600" cy="680" rx="800" ry="200" fill="#5C6B4F" opacity="0.2"/>
-  <text x="600" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#5C6B4F" opacity="0.6">R &amp; S</text>
-  <text x="600" y="460" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#8B9E7E" opacity="0.5">Remplacez par votre photo</text>
 </svg>
