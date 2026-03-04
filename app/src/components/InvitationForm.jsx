@@ -2,22 +2,6 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Plane, Home, RotateCcw, BookOpen, Users, ChevronRight } from 'lucide-react'
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.1 },
-  },
-}
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' },
-  },
-}
-
 function Field({ label, required, helper, children }) {
   return (
     <div>
@@ -53,7 +37,10 @@ function Input({ value, onChange, placeholder, type = 'text', required, disabled
 function Section({ icon: Icon, title, children }) {
   return (
     <motion.div
-      variants={sectionVariants}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8
         hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
     >
@@ -78,8 +65,8 @@ const defaultForm = {
   purpose: 'Assister au mariage de Madjdi Rafik Chemli le 19 septembre 2026',
   arrivalDate: '',
   departureDate: '',
-  cityInCanada: 'Montréal (QC)',
-  accommodationAddress: 'Chez Madjdi Rafik Chemli – 267 Rachel Est, Montréal (QC), Canada H2W 1E5',
+  cityInCanada: 'Montreal (QC)',
+  accommodationAddress: 'Chez Madjdi Rafik Chemli - 267 Rachel Est, Montreal (QC), Canada H2W 1E5',
   accommodationDatesStart: '',
   accommodationDatesEnd: '',
   returnCountry: '',
@@ -112,16 +99,9 @@ export default function InvitationForm({ onSubmit, initialData }) {
   }
 
   return (
-    <motion.form
-      onSubmit={handleSubmit}
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: '-100px' }}
-      className="space-y-6"
-    >
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* 1. Visitor Identity */}
-      <Section icon={User} title="1. Identité du visiteur">
+      <Section icon={User} title="1. Identite du visiteur">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="sm:col-span-2">
             <Field label="Nom complet (tel que sur le passeport)" required>
@@ -131,15 +111,15 @@ export default function InvitationForm({ onSubmit, initialData }) {
           <Field label="Date de naissance" required helper="Format AAAA-MM-JJ">
             <Input type="date" value={form.dob} onChange={set('dob')} required />
           </Field>
-          <Field label="Nationalité" required>
-            <Input value={form.nationality} onChange={set('nationality')} placeholder="Française" required />
+          <Field label="Nationalite" required>
+            <Input value={form.nationality} onChange={set('nationality')} placeholder="Francaise" required />
           </Field>
         </div>
-        <Field label="Adresse résidentielle complète" required>
+        <Field label="Adresse residentielle complete" required>
           <Input value={form.address} onChange={set('address')} placeholder="123 Rue Exemple, Paris, France" required />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="Téléphone" required>
+          <Field label="Telephone" required>
             <Input type="tel" value={form.phone} onChange={set('phone')} placeholder="+33 6 12 34 56 78" required />
           </Field>
           <Field label="Courriel" required>
@@ -149,19 +129,19 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 2. Travel Details */}
-      <Section icon={Plane} title="2. Détails du voyage">
+      <Section icon={Plane} title="2. Details du voyage">
         <Field label="Motif du voyage">
           <Input value={form.purpose} onChange={set('purpose')} disabled />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <Field label="Date d'arrivée" required>
+          <Field label="Date d'arrivee" required>
             <Input type="date" value={form.arrivalDate} onChange={set('arrivalDate')} required />
           </Field>
-          <Field label="Date de départ" required>
+          <Field label="Date de depart" required>
             <Input type="date" value={form.departureDate} onChange={set('departureDate')} required />
           </Field>
-          <Field label="Durée totale" helper="Calculée automatiquement">
-            <Input value={duration()} disabled placeholder="—" />
+          <Field label="Duree totale" helper="Calculee automatiquement">
+            <Input value={duration()} disabled placeholder="--" />
           </Field>
         </div>
         <Field label="Ville au Canada">
@@ -170,22 +150,22 @@ export default function InvitationForm({ onSubmit, initialData }) {
       </Section>
 
       {/* 3. Accommodation */}
-      <Section icon={Home} title="3. Hébergement">
+      <Section icon={Home} title="3. Hebergement">
         <Field label="Adresse au Canada">
           <Input value={form.accommodationAddress} onChange={set('accommodationAddress')} disabled />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="Début hébergement (si différent)" helper="Optionnel">
+          <Field label="Debut hebergement (si different)" helper="Optionnel">
             <Input type="date" value={form.accommodationDatesStart} onChange={set('accommodationDatesStart')} />
           </Field>
-          <Field label="Fin hébergement (si différent)" helper="Optionnel">
+          <Field label="Fin hebergement (si different)" helper="Optionnel">
             <Input type="date" value={form.accommodationDatesEnd} onChange={set('accommodationDatesEnd')} />
           </Field>
         </div>
       </Section>
 
       {/* 4. Return */}
-      <Section icon={RotateCcw} title="4. Retour après la visite">
+      <Section icon={RotateCcw} title="4. Retour apres la visite">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Pays de retour" required>
             <Input value={form.returnCountry} onChange={set('returnCountry')} placeholder="France" required />
@@ -199,24 +179,30 @@ export default function InvitationForm({ onSubmit, initialData }) {
       {/* 5. Passport */}
       <Section icon={BookOpen} title="5. Passeport (optionnel)">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="Numéro de passeport">
+          <Field label="Numero de passeport">
             <Input value={form.passportNumber} onChange={set('passportNumber')} placeholder="AB1234567" />
           </Field>
-          <Field label="Pays de délivrance">
+          <Field label="Pays de delivrance">
             <Input value={form.issuingCountry} onChange={set('issuingCountry')} placeholder="France" />
           </Field>
         </div>
       </Section>
 
       {/* 6. Relationship */}
-      <Section icon={Users} title="6. Lien avec l'hôte">
+      <Section icon={Users} title="6. Lien avec l'hote">
         <Field label="Relation avec Madjdi Rafik Chemli" required>
-          <Input value={form.relationship} onChange={set('relationship')} placeholder="Cousin, ami, collègue..." required />
+          <Input value={form.relationship} onChange={set('relationship')} placeholder="Cousin, ami, collegue..." required />
         </Field>
       </Section>
 
       {/* Submit */}
-      <motion.div variants={sectionVariants} className="pt-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="pt-4"
+      >
         <motion.button
           type="submit"
           whileHover={{ scale: 1.02 }}
@@ -226,10 +212,10 @@ export default function InvitationForm({ onSubmit, initialData }) {
             focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
             transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
         >
-          Générer la lettre
+          Generer la lettre
           <ChevronRight className="w-4 h-4" />
         </motion.button>
       </motion.div>
-    </motion.form>
+    </form>
   )
 }

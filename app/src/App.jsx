@@ -6,8 +6,8 @@ import LetterPreview from './components/LetterPreview'
 import './index.css'
 
 const steps = [
-  { label: 'Formulaire', icon: FileText },
-  { label: 'Aperçu', icon: Check },
+  { id: 'form', label: 'Formulaire' },
+  { id: 'preview', label: 'Apercu' },
 ]
 
 function App() {
@@ -41,32 +41,49 @@ function App() {
             </div>
             <div>
               <h1 className="text-sm font-semibold text-gray-900 leading-tight">Rafik & Sandrine</h1>
-              <p className="text-xs text-gray-500">19 septembre 2026 — Montréal</p>
+              <p className="text-xs text-gray-500">19 septembre 2026</p>
             </div>
           </div>
 
-          {/* Step indicator — desktop */}
-          <div className="hidden sm:flex items-center gap-2 text-xs">
+          {/* Step indicator with layoutId pill */}
+          <div className="hidden sm:flex items-center gap-2 text-xs relative">
             {steps.map((step, i) => (
-              <div key={step.label} className="flex items-center gap-2">
-                <motion.span
-                  layout
-                  className={`px-3 py-1.5 rounded-full font-medium transition-all duration-300 ${
+              <div key={step.id} className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (i < currentStep) setCurrentStep(i)
+                  }}
+                  className={`relative px-3 py-1.5 rounded-full font-medium transition-colors duration-300 cursor-default ${
+                    i < currentStep ? 'cursor-pointer' : ''
+                  } ${
                     i === currentStep
-                      ? 'bg-blue-500 text-white shadow-sm'
+                      ? 'text-white'
                       : i < currentStep
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'bg-gray-100 text-gray-400'
+                        ? 'text-blue-600'
+                        : 'text-gray-400'
                   }`}
                 >
-                  {step.label}
-                </motion.span>
+                  {i === currentStep && (
+                    <motion.span
+                      layoutId="step-pill"
+                      className="absolute inset-0 bg-blue-500 rounded-full shadow-sm"
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    />
+                  )}
+                  {i < currentStep && (
+                    <span className="absolute inset-0 bg-blue-50 rounded-full" />
+                  )}
+                  {i > currentStep && (
+                    <span className="absolute inset-0 bg-gray-100 rounded-full" />
+                  )}
+                  <span className="relative z-10">{step.label}</span>
+                </button>
                 {i < steps.length - 1 && <ChevronRight className="w-3.5 h-3.5 text-gray-300" />}
               </div>
             ))}
           </div>
 
-          {/* Step indicator — mobile */}
+          {/* Mobile step counter */}
           <div className="sm:hidden text-xs font-medium text-gray-500">
             {currentStep + 1}/{steps.length}
           </div>
@@ -78,41 +95,32 @@ function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
             {currentStep === 0 && (
               <>
-                <div className="text-center mb-10 sm:mb-14">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-medium tracking-wider uppercase mb-5"
-                  >
+                <motion.div
+                  className="text-center mb-10 sm:mb-14"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-100px' }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                >
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-medium tracking-wider uppercase mb-5">
                     <FileText className="w-3.5 h-3.5" />
                     Lettre d'invitation IRCC
-                  </motion.div>
-                  <motion.h2
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.15 }}
-                    className="text-3xl sm:text-4xl font-semibold text-gray-900 mb-4 leading-[1.2]"
-                  >
-                    Générez votre lettre d'invitation
-                  </motion.h2>
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="text-base text-gray-500 max-w-lg mx-auto leading-relaxed"
-                  >
-                    Remplissez le formulaire ci-dessous pour générer une lettre officielle
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-semibold text-gray-900 mb-4 leading-[1.2]">
+                    Generez votre lettre d'invitation
+                  </h2>
+                  <p className="text-base text-gray-500 max-w-lg mx-auto leading-relaxed">
+                    Remplissez le formulaire ci-dessous pour generer une lettre officielle
                     pour votre demande de visa visiteur au Canada.
-                  </motion.p>
-                </div>
+                  </p>
+                </motion.div>
                 <InvitationForm onSubmit={handleFormSubmit} initialData={formData} />
               </>
             )}
@@ -126,7 +134,7 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-8 sm:py-10 text-center text-xs text-gray-400">
-        Mariage Rafik & Sandrine — 19 septembre 2026 — Montréal
+        Mariage Rafik & Sandrine — 19 septembre 2026 — Montreal
       </footer>
     </div>
   )

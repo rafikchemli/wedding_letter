@@ -6,46 +6,46 @@ import { saveAs } from 'file-saver'
 function generateLetterText(d) {
   const today = new Date().toISOString().split('T')[0]
   const passportLine = d.passportNumber
-    ? `, passeport no ${d.passportNumber} (délivré par ${d.issuingCountry || '—'})`
+    ? `, passeport no ${d.passportNumber} (delivre par ${d.issuingCountry || '--'})`
     : ''
   const accomDates =
     d.accommodationDatesStart && d.accommodationDatesEnd
-      ? ` (ou du ${d.accommodationDatesStart} au ${d.accommodationDatesEnd} si différent)`
+      ? ` (ou du ${d.accommodationDatesStart} au ${d.accommodationDatesEnd} si different)`
       : ''
 
   return `Madjdi Rafik Chemli
-Adresse : 267 Rachel Est, Montréal (QC), Canada H2W 1E5
-Ville : Montréal
+Adresse : 267 Rachel Est, Montreal (QC), Canada H2W 1E5
+Ville : Montreal
 
 Date : ${today}
 
-À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)
-Objet : Lettre d'invitation — Demande de visa visiteur pour ${d.fullName}
+A : Immigration, Refugies et Citoyennete Canada (IRCC)
+Objet : Lettre d'invitation -- Demande de visa visiteur pour ${d.fullName}
 
-Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994, citoyen canadien, résidant au 267 Rachel Est, Montréal (QC), Canada, invite par la présente ${d.fullName}, né(e) le ${d.dob}, de nationalité ${d.nationality}, résidant au ${d.address}, téléphone ${d.phone}, courriel ${d.email}${passportLine}, à venir au Canada pour un séjour temporaire.
+Je soussigne Madjdi Rafik Chemli, ne le 21 juin 1994, citoyen canadien, residant au 267 Rachel Est, Montreal (QC), Canada, invite par la presente ${d.fullName}, ne(e) le ${d.dob}, de nationalite ${d.nationality}, residant au ${d.address}, telephone ${d.phone}, courriel ${d.email}${passportLine}, a venir au Canada pour un sejour temporaire.
 
-Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Quebec.
+Motif du voyage : assister a mon mariage, prevu le 19 septembre 2026 a Montreal, Quebec.
 
-Dates prévues du séjour : du ${d.arrivalDate} au ${d.departureDate} (durée totale : ${d.duration}).
-Hébergement : ${d.fullName} logera chez moi au 267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur, pendant la durée du séjour${accomDates}.
+Dates prevues du sejour : du ${d.arrivalDate} au ${d.departureDate} (duree totale : ${d.duration}).
+Hebergement : ${d.fullName} logera chez moi au 267 Rachel Est, Montreal (QC), Canada, sans frais pour le visiteur, pendant la duree du sejour${accomDates}.
 
-Dispositions financières : ${d.fullName} assumera l'ensemble des frais liés à son voyage et à son séjour, incluant notamment le billet d'avion, le transport local, la nourriture, l'assurance voyage et les dépenses personnelles.
+Dispositions financieres : ${d.fullName} assumera l'ensemble des frais lies a son voyage et a son sejour, incluant notamment le billet d'avion, le transport local, la nourriture, l'assurance voyage et les depenses personnelles.
 
-Départ du Canada : ${d.fullName} quittera le Canada au plus tard le ${d.departureDate} afin de retourner à ${d.returnCountry}.
+Depart du Canada : ${d.fullName} quittera le Canada au plus tard le ${d.departureDate} afin de retourner a ${d.returnCountry}.
 
 Mes informations professionnelles :
 
 Poste : Senior Data Scientist (EC-05)
-Employeur : Statistique Canada — CAIRE (Centre of AI Research and Expertise)
-Ville : Montréal
+Employeur : Statistique Canada -- CAIRE (Centre of AI Research and Expertise)
+Ville : Montreal
 
 Lien avec le visiteur : ${d.relationship}.
 
-Détails de ma famille :
+Details de ma famille :
 
-Conjointe : Sandrine Martelle, née le 3 février 1995.
+Conjointe : Sandrine Martelle, nee le 3 fevrier 1995.
 
-Je confirme que les informations ci-dessus sont exactes et fournies à l'appui de la demande de visa visiteur de ${d.fullName}.
+Je confirme que les informations ci-dessus sont exactes et fournies a l'appui de la demande de visa visiteur de ${d.fullName}.
 
 Cordialement,
 
@@ -81,45 +81,35 @@ async function downloadPdf(d) {
     .save()
 }
 
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1 } },
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-}
-
 export default function LetterPreview({ data, onBack }) {
   const letterText = generateLetterText(data)
 
   return (
-    <motion.div
-      variants={stagger}
-      initial="hidden"
-      animate="show"
-      className="space-y-6"
-    >
-      {/* Success banner */}
+    <div className="space-y-6">
+      {/* Success banner — slides in from top with spring physics */}
       <motion.div
-        variants={fadeUp}
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className="bg-green-50 border border-green-200 rounded-2xl p-5 flex items-start gap-3"
       >
         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
           <Check className="w-4 h-4 text-green-600" />
         </div>
         <div>
-          <p className="text-sm font-medium text-green-900">Lettre générée avec succès</p>
+          <p className="text-sm font-medium text-green-900">Lettre generee avec succes</p>
           <p className="text-sm text-green-700 mt-0.5">
-            Vérifiez l'aperçu ci-dessous puis téléchargez en DOCX ou PDF.
+            Verifiez l'apercu ci-dessous puis telechargez en DOCX ou PDF.
           </p>
         </div>
       </motion.div>
 
       {/* Actions */}
       <motion.div
-        variants={fadeUp}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <motion.button
@@ -164,13 +154,16 @@ export default function LetterPreview({ data, onBack }) {
 
       {/* Letter preview card */}
       <motion.div
-        variants={fadeUp}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
         className="animated-border bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
       >
         <div className="bg-gray-50 border-b border-gray-200 px-6 py-3.5 flex items-center gap-2">
           <FileText className="w-4 h-4 text-gray-400" />
           <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Aperçu de la lettre
+            Apercu de la lettre
           </span>
         </div>
         <div
@@ -181,6 +174,6 @@ export default function LetterPreview({ data, onBack }) {
           {letterText}
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   )
 }
