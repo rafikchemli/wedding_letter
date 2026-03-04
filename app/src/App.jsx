@@ -37,14 +37,11 @@ const calligraphyContainer = {
 }
 
 const calligraphyChild = {
-  hidden: { opacity: 0, y: 12, scaleY: 0.3, scaleX: 0.7, filter: 'blur(6px)' },
+  hidden: { clipPath: 'inset(0 100% 0 0)', opacity: 0 },
   visible: {
+    clipPath: 'inset(0 0% 0 0)',
     opacity: 1,
-    y: 0,
-    scaleY: 1,
-    scaleX: 1,
-    filter: 'blur(0px)',
-    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
   },
 }
 
@@ -62,10 +59,9 @@ function AnimatedName({ text, delay = 0, className: cls = '' }) {
         <motion.span
           key={i}
           variants={calligraphyChild}
-          className="calligraphy-letter"
+          className="inline-block"
           style={{
             minWidth: char === ' ' ? '0.3em' : undefined,
-            transformOrigin: 'bottom left',
           }}
         >
           {char}
