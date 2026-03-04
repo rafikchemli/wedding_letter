@@ -11,9 +11,9 @@ const steps = [
 ]
 
 const photos = [
-  { src: '/photos/beach.jpg', alt: 'Rafik & Sandrine au coucher de soleil' },
-  { src: '/photos/dunes.jpg', alt: 'Rafik & Sandrine sur les dunes' },
-  { src: '/photos/hero.jpg', alt: 'Rafik & Sandrine dans le désert' },
+  { src: '/photos/beach.svg', alt: 'Rafik & Sandrine au coucher de soleil' },
+  { src: '/photos/dunes.svg', alt: 'Rafik & Sandrine sur les dunes' },
+  { src: '/photos/hero.svg', alt: 'Rafik & Sandrine dans le désert' },
 ]
 
 function FloatingPetals() {
@@ -175,7 +175,7 @@ function App() {
           {/* Background photo */}
           <div className="absolute inset-0 z-0">
             <img
-              src="/photos/hero.jpg"
+              src="/photos/hero.svg"
               alt=""
               className="w-full h-full object-cover"
             />
