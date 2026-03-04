@@ -1,15 +1,73 @@
 @import "tailwindcss";
 
+/* ─── Theme tokens ─── */
+:root, [data-theme="sand"] {
+  --surface: #FFFBF7;
+  --surface-alt: #FDF8F4;
+  --text: #3B4A30;
+  --text-muted: #7A6B55;
+  --border: #E8C4B8;
+  --border-10: rgba(232, 196, 184, 0.1);
+  --border-20: rgba(232, 196, 184, 0.2);
+  --border-30: rgba(232, 196, 184, 0.3);
+  --border-40: rgba(232, 196, 184, 0.4);
+  --border-50: rgba(232, 196, 184, 0.5);
+  --text-70: rgba(59, 74, 48, 0.7);
+  --text-muted-60: rgba(122, 107, 85, 0.6);
+  --text-muted-70: rgba(122, 107, 85, 0.7);
+  --accent: #B8864A;
+  --accent-hover: #A47640;
+  --accent-5: rgba(184, 134, 74, 0.05);
+  --accent-10: rgba(184, 134, 74, 0.1);
+  --accent-15: rgba(184, 134, 74, 0.15);
+  --accent-20: rgba(184, 134, 74, 0.2);
+  --accent-30: rgba(184, 134, 74, 0.3);
+  --accent-dark: #6A4A20;
+  --accent-dark-hover: #5A3A18;
+}
+
+[data-theme="snow"] {
+  --surface: #1A2430;
+  --surface-alt: #151D28;
+  --text: #D8E4F0;
+  --text-muted: #6880A0;
+  --border: #3A506A;
+  --border-10: rgba(58, 80, 106, 0.1);
+  --border-20: rgba(58, 80, 106, 0.2);
+  --border-30: rgba(58, 80, 106, 0.3);
+  --border-40: rgba(58, 80, 106, 0.4);
+  --border-50: rgba(58, 80, 106, 0.5);
+  --text-70: rgba(216, 228, 240, 0.7);
+  --text-muted-60: rgba(104, 128, 160, 0.6);
+  --text-muted-70: rgba(104, 128, 160, 0.7);
+  --accent: #5B8FAF;
+  --accent-hover: #4B7F9F;
+  --accent-5: rgba(91, 143, 175, 0.05);
+  --accent-10: rgba(91, 143, 175, 0.1);
+  --accent-15: rgba(91, 143, 175, 0.15);
+  --accent-20: rgba(91, 143, 175, 0.2);
+  --accent-30: rgba(91, 143, 175, 0.3);
+  --accent-dark: #1A3454;
+  --accent-dark-hover: #14283F;
+}
+
 /* ─── Fonts ─── */
 html {
   scroll-behavior: smooth;
+  background-color: #FDF5ED;
 }
 
 body {
   font-family: 'Lato', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FDF8F4;
+  background-color: #FDF5ED;
+  transition: background-color 0.7s;
+}
+
+[data-theme="snow"] body,
+[data-theme="snow"] {
+  background-color: #111820;
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {
@@ -46,12 +104,12 @@ h1, h2, h3, h4, h5, h6, .font-display {
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    #8B9E7E 30deg,
-    #E8C4B8 60deg,
+    var(--accent) 30deg,
+    var(--border) 60deg,
     transparent 90deg,
     transparent 180deg,
-    #8B9E7E 210deg,
-    #E8C4B8 240deg,
+    var(--accent) 210deg,
+    var(--border) 240deg,
     transparent 270deg
   );
   animation: spin-border 4s linear infinite;
@@ -62,54 +120,23 @@ h1, h2, h3, h4, h5, h6, .font-display {
   position: absolute;
   inset: 2px;
   z-index: -1;
-  background: #FFFBF7;
+  background: var(--surface);
   border-radius: inherit;
 }
 
-/* ─── Floating petals animation ─── */
-@keyframes float-petal {
-  0% {
-    transform: translateY(0) rotate(0deg) scale(1);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.7;
-  }
-  90% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg) scale(0.5);
-    opacity: 0;
-  }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.petal {
-  position: fixed;
-  pointer-events: none;
-  z-index: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50% 0 50% 50%;
-  background: linear-gradient(135deg, #E8C4B8, #F5DED5);
-  opacity: 0;
-}
-
-.petal:nth-child(1) { left: 10%; animation: float-petal 12s 0s infinite ease-in-out; }
-.petal:nth-child(2) { left: 25%; animation: float-petal 15s 2s infinite ease-in-out; width: 8px; height: 8px; }
-.petal:nth-child(3) { left: 45%; animation: float-petal 18s 4s infinite ease-in-out; }
-.petal:nth-child(4) { left: 65%; animation: float-petal 14s 1s infinite ease-in-out; width: 10px; height: 10px; }
-.petal:nth-child(5) { left: 80%; animation: float-petal 16s 3s infinite ease-in-out; }
-.petal:nth-child(6) { left: 35%; animation: float-petal 20s 5s infinite ease-in-out; width: 6px; height: 6px; }
-.petal:nth-child(7) { left: 55%; animation: float-petal 13s 7s infinite ease-in-out; }
-.petal:nth-child(8) { left: 90%; animation: float-petal 17s 2.5s infinite ease-in-out; width: 9px; height: 9px; }
+/* Particle system is now canvas-based — see ParticleSystem.jsx */
 
 /* ─── Ornamental divider ─── */
 .ornament {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #7A6B55;
+  color: var(--text-muted);
 }
 
 .ornament::before,
@@ -117,7 +144,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, transparent, #E8C4B8, transparent);
+  background: linear-gradient(to right, transparent, var(--ornament-line, var(--border)), transparent);
 }
 
 /* ─── Calligraphy font for names ─── */
@@ -125,12 +152,16 @@ h1, h2, h3, h4, h5, h6, .font-display {
   font-family: 'Great Vibes', cursive;
 }
 
+/* ─── Snow / dark theme overrides ─── */
+[data-theme="snow"] ::selection {
+  background: rgba(80, 120, 180, 0.4);
+  color: #E4ECF4;
+}
+
+/* Snow overrides for ornament/border now handled by CSS variables above */
+
 /* ─── Reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {
-  .petal {
-    animation: none !important;
-    display: none;
-  }
   .animated-border::before {
     animation: none !important;
   }

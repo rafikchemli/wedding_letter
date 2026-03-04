@@ -6,13 +6,13 @@ import { User, Plane, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileT
 function Field({ label, required, helper, error, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-[#3B4A30] mb-1.5">
+      <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
         {label}
-        {required && <span className="text-[#E8C4B8] ml-0.5">*</span>}
+        {required && <span className="text-[var(--border)] ml-0.5">*</span>}
       </label>
       {children}
       {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
-      {!error && helper && <p className="text-xs text-[#7A6B55] mt-1.5">{helper}</p>}
+      {!error && helper && <p className="text-xs text-[var(--text-muted)] mt-1.5">{helper}</p>}
     </div>
   )
 }
@@ -31,13 +31,13 @@ function Input({ value, onChange, placeholder, type = 'text', required, disabled
       required={required}
       disabled={disabled}
       aria-invalid={showError ? 'true' : undefined}
-      className={`w-full rounded-xl bg-[#FFFBF7] border px-4 py-2.5 text-sm text-[#3B4A30]
-        placeholder:text-[#7A6B55]/60
-        focus:ring-2 focus:ring-[#8B9E7E]/20
-        focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+      className={`w-full rounded-xl bg-[var(--surface)] border px-4 py-2.5 text-sm text-[var(--text)]
+        placeholder:text-[var(--text-muted-60)]
+        focus:ring-2 focus:ring-[var(--accent-20)]
+        focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
         transition-all duration-200 outline-none
         disabled:opacity-50 disabled:cursor-not-allowed
-        ${showError ? 'border-red-400 focus:border-red-400' : 'border-[#E8C4B8]/40 focus:border-[#8B9E7E]'}`}
+        ${showError ? 'border-red-400 focus:border-red-400' : 'border-[var(--border-40)] focus:border-[var(--accent)]'}`}
       {...rest}
     />
   )
@@ -50,14 +50,14 @@ function Section({ icon: Icon, title, children, delay = 0 }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      className="bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30 shadow-sm p-6 sm:p-8
+      className="bg-[var(--surface)] rounded-2xl border border-[var(--border-30)] shadow-sm p-6 sm:p-8
         hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-[#8B9E7E]/10 flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5 text-[#8B9E7E]" />
+        <div className="w-10 h-10 rounded-full bg-[var(--accent-10)] flex items-center justify-center shrink-0">
+          <Icon className="w-5 h-5 text-[var(--accent)]" />
         </div>
-        <h3 className="font-display text-lg font-semibold text-[#3B4A30]">{title}</h3>
+        <h3 className="font-display text-lg font-semibold text-[var(--text)]">{title}</h3>
       </div>
       <div className="space-y-5">{children}</div>
     </motion.div>
@@ -111,7 +111,7 @@ const isDev = import.meta.env.DEV
 function LetterTemplate() {
   return (
     <div
-      className="text-[#3B4A30] leading-[1.85] space-y-[1em]"
+      className="text-[var(--text)] leading-[1.85] space-y-[1em]"
       style={{
         fontFamily: "'Cormorant Garamond', Georgia, serif",
         fontSize: 'clamp(1rem, 0.8rem + 0.8vw, 1.35rem)',
@@ -119,42 +119,42 @@ function LetterTemplate() {
     >
       <div className="text-center mb-[1em]">
         <p className="font-semibold">Madjdi Rafik Chemli</p>
-        <p className="text-[0.85em] text-[#7A6B55]">308-267 Rachel Est, Montréal (QC), Canada H2W 1E5</p>
+        <p className="text-[0.85em] text-[var(--text-muted)]">308-267 Rachel Est, Montréal (QC), Canada H2W 1E5</p>
       </div>
-      <div className="h-px bg-[#E8C4B8]/30" />
-      <p className="text-[#7A6B55] text-[0.85em]">Date : <span className="italic">[date du jour]</span></p>
-      <p className="text-[#7A6B55] text-[0.85em]">À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
-      <p className="font-semibold text-[#3B4A30]">
-        Objet : Lettre d'invitation — Demande de visa visiteur pour <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom du visiteur]</mark>
+      <div className="h-px bg-[var(--border-30)]" />
+      <p className="text-[var(--text-muted)] text-[0.85em]">Date : <span className="italic">[date du jour]</span></p>
+      <p className="text-[var(--text-muted)] text-[0.85em]">À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
+      <p className="font-semibold text-[var(--text)]">
+        Objet : Lettre d'invitation — Demande de visa visiteur pour <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom du visiteur]</mark>
       </p>
-      <div className="h-px bg-[#E8C4B8]/30" />
+      <div className="h-px bg-[var(--border-30)]" />
       <p>
-        Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom du visiteur]</mark>, né(e) le <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date de naissance]</mark>, de nationalité <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[nationalité]</mark>, résidant au <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[adresse]</mark>, téléphone <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[tél]</mark>, courriel <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[courriel]</mark>, à venir au Canada pour un séjour temporaire.
+        Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom du visiteur]</mark>, né(e) le <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date de naissance]</mark>, de nationalité <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[nationalité]</mark>, résidant au <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[adresse]</mark>, téléphone <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[tél]</mark>, courriel <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[courriel]</mark>, à venir au Canada pour un séjour temporaire.
       </p>
-      <p className="font-medium text-[#8B9E7E]">
+      <p className="font-medium text-[var(--accent)]">
         Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.
       </p>
       <p>
-        Dates prévues du séjour : du <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date d'arrivée]</mark> au <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date de départ]</mark> (durée totale : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[X jours]</mark>).
+        Dates prévues du séjour : du <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date d'arrivée]</mark> au <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date de départ]</mark> (durée totale : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[X jours]</mark>).
       </p>
       <p>
-        Hébergement : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur.
+        Hébergement : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur.
       </p>
       <p>
-        Dispositions financières : je prendrai en charge l'hébergement de <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> à mon domicile. <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> assumera les autres frais liés à son voyage.
+        Dispositions financières : je prendrai en charge l'hébergement de <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> à mon domicile. <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> assumera les autres frais liés à son voyage.
       </p>
       <p>
-        Départ du Canada : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> quittera le Canada au plus tard le <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date de départ]</mark> afin de retourner en <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[pays de retour]</mark>.
+        Départ du Canada : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> quittera le Canada au plus tard le <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date de départ]</mark> afin de retourner en <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[pays de retour]</mark>.
       </p>
-      <div className="h-px bg-[#E8C4B8]/30" />
-      <div className="text-[0.85em] text-[#7A6B55] space-y-[0.25em]">
+      <div className="h-px bg-[var(--border-30)]" />
+      <div className="text-[0.85em] text-[var(--text-muted)] space-y-[0.25em]">
         <p>Conjointe : Sandrine Martelle, née le 3 février 1995.</p>
-        <p>Lien avec le visiteur : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[relation]</mark></p>
+        <p>Lien avec le visiteur : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[relation]</mark></p>
         <p>Poste : Scientifique principal des données (EC-05)</p>
         <p>Employeur : Gouvernement du Canada — Statistique Canada — CAIRE (Centre de recherche et d'expertise en IA)</p>
       </div>
-      <div className="h-px bg-[#E8C4B8]/30" />
-      <p className="italic text-[#7A6B55]">Cordialement,</p>
+      <div className="h-px bg-[var(--border-30)]" />
+      <p className="italic text-[var(--text-muted)]">Cordialement,</p>
       <p className="font-semibold">Madjdi Rafik Chemli</p>
     </div>
   )
@@ -350,12 +350,12 @@ export default function InvitationForm({ onSubmit, initialData }) {
             value={form.relationship}
             onChange={(e) => set('relationship')(e.target.value)}
             required
-            className={`w-full rounded-xl bg-[#FFFBF7] border px-4 py-2.5 text-sm text-[#3B4A30]
-              focus:ring-2 focus:ring-[#8B9E7E]/20
-              focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+            className={`w-full rounded-xl bg-[var(--surface)] border px-4 py-2.5 text-sm text-[var(--text)]
+              focus:ring-2 focus:ring-[var(--accent-20)]
+              focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
               transition-all duration-200 outline-none cursor-pointer appearance-none
-              ${!form.relationship ? 'text-[#7A6B55]/60' : ''}
-              ${submitted && validate('relationship') ? 'border-red-400' : 'border-[#E8C4B8]/40 focus:border-[#8B9E7E]'}`}
+              ${!form.relationship ? 'text-[var(--text-muted-60)]' : ''}
+              ${submitted && validate('relationship') ? 'border-red-400' : 'border-[var(--border-40)] focus:border-[var(--accent)]'}`}
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A6B55' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
           >
             <option value="" disabled>Choisir le lien...</option>
@@ -380,12 +380,12 @@ export default function InvitationForm({ onSubmit, initialData }) {
           ref={templateTriggerRef}
           type="button"
           onClick={() => setShowTemplate(true)}
-          className="w-full flex items-center justify-center gap-2 bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30
-            px-6 py-4 text-sm font-medium text-[#3B4A30] hover:bg-[#FDF8F4] hover:shadow-sm
-            focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+          className="w-full flex items-center justify-center gap-2 bg-[var(--surface)] rounded-2xl border border-[var(--border-30)]
+            px-6 py-4 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-alt)] hover:shadow-sm
+            focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
             transition-all duration-200 cursor-pointer"
         >
-          <Eye className="w-4 h-4 text-[#8B9E7E]" />
+          <Eye className="w-4 h-4 text-[var(--accent)]" />
           Voir le modèle de lettre
         </button>
       </motion.div>
@@ -415,29 +415,29 @@ export default function InvitationForm({ onSubmit, initialData }) {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="fixed inset-x-0 bottom-0 z-[101] flex flex-col bg-[#FFFBF7] rounded-t-3xl shadow-2xl overflow-hidden"
+                className="fixed inset-x-0 bottom-0 z-[101] flex flex-col bg-[var(--surface)] rounded-t-3xl shadow-2xl overflow-hidden"
                 style={{ maxHeight: '90vh' }}
               >
                 {/* Drag handle */}
                 <div className="flex justify-center pt-3 pb-1">
-                  <div className="w-10 h-1 rounded-full bg-[#E8C4B8]/50" />
+                  <div className="w-10 h-1 rounded-full bg-[var(--border-50)]" />
                 </div>
 
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-[#E8C4B8]/30" style={{ padding: 'clamp(0.5rem, 1vw, 0.75rem) clamp(1.5rem, 4vw, 4rem)' }}>
+                <div className="flex items-center justify-between border-b border-[var(--border-30)]" style={{ padding: 'clamp(0.5rem, 1vw, 0.75rem) clamp(1.5rem, 4vw, 4rem)' }}>
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#8B9E7E]" />
-                    <h3 className="font-display font-semibold text-[#3B4A30]" style={{ fontSize: 'clamp(1rem, 0.8rem + 0.6vw, 1.25rem)' }}>Modèle de lettre</h3>
+                    <FileText className="w-4 h-4 text-[var(--accent)]" />
+                    <h3 className="font-display font-semibold text-[var(--text)]" style={{ fontSize: 'clamp(1rem, 0.8rem + 0.6vw, 1.25rem)' }}>Modèle de lettre</h3>
                   </div>
                   <button
                     type="button"
                     onClick={closeTemplate}
-                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E8C4B8]/20
-                      focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[var(--border-20)]
+                      focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
                       transition-colors duration-200 cursor-pointer"
                     aria-label="Fermer"
                   >
-                    <X className="w-5 h-5 text-[#3B4A30]" />
+                    <X className="w-5 h-5 text-[var(--text)]" />
                   </button>
                 </div>
 
@@ -446,8 +446,8 @@ export default function InvitationForm({ onSubmit, initialData }) {
                   <div className="flex justify-center" style={{ padding: 'clamp(1.5rem, 4vw, 4rem)' }}>
                     <div className="w-full" style={{ maxWidth: 'clamp(24rem, 55vw, 52rem)' }}>
                   <div className="flex items-center gap-2 mb-[2em]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8B9E7E]" />
-                    <p className="text-[0.85em] text-[#7A6B55] uppercase tracking-wider font-medium" style={{ fontSize: 'clamp(0.75rem, 0.6rem + 0.5vw, 1rem)' }}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+                    <p className="text-[0.85em] text-[var(--text-muted)] uppercase tracking-wider font-medium" style={{ fontSize: 'clamp(0.75rem, 0.6rem + 0.5vw, 1rem)' }}>
                       Les champs surlignés seront remplis avec vos informations
                     </p>
                   </div>
@@ -474,9 +474,9 @@ export default function InvitationForm({ onSubmit, initialData }) {
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full sm:w-auto bg-[#8B9E7E] text-white rounded-full px-8 py-3 text-sm font-medium
-            hover:bg-[#7A8E6D] shadow-md hover:shadow-lg
-            focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+          className="w-full sm:w-auto bg-[var(--accent)] text-white rounded-full px-8 py-3 text-sm font-medium
+            hover:bg-[var(--accent-hover)] shadow-md hover:shadow-lg
+            focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
             transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
         >
           Générer la lettre

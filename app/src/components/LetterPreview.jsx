@@ -205,7 +205,7 @@ function OrnamentalDivider({ className = '' }) {
 function LetterDivider() {
   return (
     <div className="flex items-center gap-3 my-5">
-      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E8C4B8]/50 to-transparent" />
+      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-50)] to-transparent" />
     </div>
   )
 }
@@ -225,8 +225,8 @@ function StyledLetterPreview({ data }) {
     <div className="space-y-0">
       {/* Sender header */}
       <div className="text-center mb-8">
-        <h3 className="font-calligraphy text-3xl text-[#3B4A30] mb-2">Madjdi Rafik Chemli</h3>
-        <p className="text-xs text-[#7A6B55] tracking-wider uppercase">
+        <h3 className="font-calligraphy text-3xl text-[var(--text)] mb-2">Madjdi Rafik Chemli</h3>
+        <p className="text-xs text-[var(--text-muted)] tracking-wider uppercase">
           308-267 Rachel Est, Montréal (QC), Canada H2W 1E5
         </p>
       </div>
@@ -234,25 +234,25 @@ function StyledLetterPreview({ data }) {
       <LetterDivider />
 
       {/* Date & addressee */}
-      <div className="text-sm text-[#3B4A30]/70 space-y-1 mb-6">
+      <div className="text-sm text-[var(--text-70)] space-y-1 mb-6">
         <p>Date : {today}</p>
         <p>À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
       </div>
 
       {/* Subject */}
-      <div className="bg-[#8B9E7E]/5 border-l-3 border-[#8B9E7E] rounded-r-lg px-4 py-3 mb-6">
-        <p className="font-display text-base font-semibold text-[#3B4A30]">
+      <div className="bg-[var(--accent-5)] border-l-3 border-[var(--accent)] rounded-r-lg px-4 py-3 mb-6">
+        <p className="font-display text-base font-semibold text-[var(--text)]">
           Objet : Lettre d'invitation — Demande de visa visiteur pour {d.fullName}
         </p>
       </div>
 
       {/* Body paragraphs */}
-      <div className="space-y-4 text-sm text-[#3B4A30] leading-[1.85]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '15px' }}>
+      <div className="space-y-4 text-sm text-[var(--text)] leading-[1.85]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '15px' }}>
         <p>
-          Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <strong className="text-[#3B4A30]">{d.fullName}</strong>, né(e) le {d.dob}, de nationalité {d.nationality}, résidant au {d.address}, téléphone {d.phone}, courriel {d.email}{passportLine}, à venir au Canada pour un séjour temporaire.
+          Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <strong className="text-[var(--text)]">{d.fullName}</strong>, né(e) le {d.dob}, de nationalité {d.nationality}, résidant au {d.address}, téléphone {d.phone}, courriel {d.email}{passportLine}, à venir au Canada pour un séjour temporaire.
         </p>
 
-        <p className="font-medium text-[#8B9E7E]">
+        <p className="font-medium text-[var(--accent)]">
           Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.
         </p>
 
@@ -274,16 +274,16 @@ function StyledLetterPreview({ data }) {
         <LetterDivider />
 
         {/* Host info block */}
-        <div className="bg-[#FDF8F4] rounded-xl p-4 border border-[#E8C4B8]/20">
-          <p className="font-display font-semibold text-[#3B4A30] mb-2">Informations de l'hôte :</p>
+        <div className="bg-[var(--surface-alt)] rounded-xl p-4 border border-[var(--border-20)]">
+          <p className="font-display font-semibold text-[var(--text)] mb-2">Informations de l'hôte :</p>
           <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-            <span className="text-[#7A6B55]">Conjointe</span>
+            <span className="text-[var(--text-muted)]">Conjointe</span>
             <span>Sandrine Martelle, née le 3 février 1995</span>
-            <span className="text-[#7A6B55]">Lien</span>
+            <span className="text-[var(--text-muted)]">Lien</span>
             <span>{d.relationship}</span>
-            <span className="text-[#7A6B55]">Poste</span>
+            <span className="text-[var(--text-muted)]">Poste</span>
             <span>Scientifique principal des données (EC-05)</span>
-            <span className="text-[#7A6B55]">Employeur</span>
+            <span className="text-[var(--text-muted)]">Employeur</span>
             <span>Gouvernement du Canada — Statistique Canada</span>
           </div>
         </div>
@@ -296,15 +296,15 @@ function StyledLetterPreview({ data }) {
 
         {/* Signature */}
         <div className="pt-2">
-          <p className="text-[#7A6B55] italic mb-3">Cordialement,</p>
-          <p className="font-calligraphy text-2xl text-[#3B4A30]">Madjdi Rafik Chemli</p>
+          <p className="text-[var(--text-muted)] italic mb-3">Cordialement,</p>
+          <p className="font-calligraphy text-2xl text-[var(--text)]">Madjdi Rafik Chemli</p>
         </div>
 
         <LetterDivider />
 
         {/* Enclosures */}
-        <div className="text-xs text-[#7A6B55]">
-          <p className="font-semibold text-[#3B4A30] mb-1">p.j. (pièces jointes) :</p>
+        <div className="text-xs text-[var(--text-muted)]">
+          <p className="font-semibold text-[var(--text)] mb-1">p.j. (pièces jointes) :</p>
           <p>– Copie de la carte de citoyenneté canadienne</p>
           <p>– Preuve d'emploi</p>
           <p>– Talon de paie récent</p>
@@ -355,14 +355,14 @@ export default function LetterPreview({ data, onBack }) {
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="bg-[#8B9E7E]/10 border border-[#8B9E7E]/30 rounded-2xl p-5 flex items-start gap-3"
+        className="bg-[var(--accent-10)] border border-[var(--accent-30)] rounded-2xl p-5 flex items-start gap-3"
       >
-        <div className="w-8 h-8 rounded-full bg-[#8B9E7E]/20 flex items-center justify-center shrink-0 mt-0.5">
-          <Check className="w-4 h-4 text-[#3B4A30]" />
+        <div className="w-8 h-8 rounded-full bg-[var(--accent-20)] flex items-center justify-center shrink-0 mt-0.5">
+          <Check className="w-4 h-4 text-[var(--text)]" />
         </div>
         <div>
-          <p className="text-sm font-medium text-[#3B4A30]">Lettre générée avec succès</p>
-          <p className="text-sm text-[#8B9E7E] mt-0.5">
+          <p className="text-sm font-medium text-[var(--text)]">Lettre générée avec succès</p>
+          <p className="text-sm text-[var(--accent)] mt-0.5">
             Vérifiez l'aperçu ci-dessous puis téléchargez en DOCX ou PDF.
           </p>
         </div>
@@ -380,9 +380,9 @@ export default function LetterPreview({ data, onBack }) {
           onClick={onBack}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="inline-flex items-center gap-2 bg-transparent border border-[#E8C4B8]/40 text-[#3B4A30] rounded-full
-            px-5 py-2.5 text-sm font-medium hover:bg-[#E8C4B8]/10
-            focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+          className="inline-flex items-center gap-2 bg-transparent border border-[var(--border-40)] text-[var(--text)] rounded-full
+            px-5 py-2.5 text-sm font-medium hover:bg-[var(--border-10)]
+            focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
             transition-all duration-200 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -392,7 +392,7 @@ export default function LetterPreview({ data, onBack }) {
           onClick={() => downloadDocx(data)}
           icon={FileText}
           label="Télécharger DOCX"
-          className="bg-[#8B9E7E] text-white hover:bg-[#7A8E6D] focus-visible:ring-[#8B9E7E]"
+          className="bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] focus-visible:ring-[var(--accent)]"
         />
       </motion.div>
 
@@ -404,16 +404,16 @@ export default function LetterPreview({ data, onBack }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30 shadow-sm overflow-hidden"
+        className="bg-[var(--surface)] rounded-2xl border border-[var(--border-30)] shadow-sm overflow-hidden"
       >
-        <div className="bg-[#FDF8F4] border-b border-[#E8C4B8]/30 px-6 py-3.5 flex items-center gap-2">
-          <Paperclip className="w-4 h-4 text-[#7A6B55]" />
-          <span className="text-xs font-medium text-[#7A6B55] uppercase tracking-wider">
+        <div className="bg-[var(--surface-alt)] border-b border-[var(--border-30)] px-6 py-3.5 flex items-center gap-2">
+          <Paperclip className="w-4 h-4 text-[var(--text-muted)]" />
+          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
             Pièces jointes
           </span>
         </div>
         <div className="p-5 space-y-3">
-          <p className="text-sm text-[#7A6B55] text-pretty">
+          <p className="text-sm text-[var(--text-muted)] text-pretty">
             Documents justificatifs à joindre avec la lettre d'invitation.
           </p>
           <div className="space-y-2">
@@ -422,14 +422,14 @@ export default function LetterPreview({ data, onBack }) {
                 key={doc.file}
                 href={`${base}documents/${doc.file}`}
                 download
-                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E8C4B8]/20
-                  hover:bg-[#8B9E7E]/5 transition-colors duration-200 group"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--border-20)]
+                  hover:bg-[var(--accent-5)] transition-colors duration-200 group"
               >
-                <Download className="w-4 h-4 text-[#8B9E7E] shrink-0" />
-                <span className="text-sm text-[#3B4A30] group-hover:text-[#8B9E7E] transition-colors duration-200">
+                <Download className="w-4 h-4 text-[var(--accent)] shrink-0" />
+                <span className="text-sm text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200">
                   {doc.label}
                 </span>
-                <span className="ml-auto text-xs text-[#7A6B55]/60 uppercase">{doc.file.split('.').pop()}</span>
+                <span className="ml-auto text-xs text-[var(--text-muted-60)] uppercase">{doc.file.split('.').pop()}</span>
               </a>
             ))}
           </div>
@@ -438,7 +438,7 @@ export default function LetterPreview({ data, onBack }) {
               onClick={() => downloadZip(data)}
               icon={Archive}
               label="Tout télécharger (.zip)"
-              className="bg-[#3B4A30] text-white hover:bg-[#2E3B25] focus-visible:ring-[#3B4A30] w-full justify-center"
+              className="bg-[var(--accent-dark)] text-white hover:bg-[var(--accent-dark-hover)] focus-visible:ring-[var(--accent-dark)] w-full justify-center"
             />
           </div>
         </div>
@@ -450,16 +450,16 @@ export default function LetterPreview({ data, onBack }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30 shadow-sm overflow-hidden"
+        className="bg-[var(--surface)] rounded-2xl border border-[var(--border-30)] shadow-sm overflow-hidden"
       >
-        <div className="bg-[#FDF8F4] border-b border-[#E8C4B8]/30 px-6 py-3.5 flex items-center gap-2">
-          <Link className="w-4 h-4 text-[#7A6B55]" />
-          <span className="text-xs font-medium text-[#7A6B55] uppercase tracking-wider">
+        <div className="bg-[var(--surface-alt)] border-b border-[var(--border-30)] px-6 py-3.5 flex items-center gap-2">
+          <Link className="w-4 h-4 text-[var(--text-muted)]" />
+          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
             Liens utiles
           </span>
         </div>
         <div className="p-5 space-y-3">
-          <p className="text-sm text-[#7A6B55] text-pretty">
+          <p className="text-sm text-[var(--text-muted)] text-pretty">
             Ressources pour votre demande de visa visiteur au Canada.
           </p>
           <div className="space-y-2">
@@ -467,15 +467,15 @@ export default function LetterPreview({ data, onBack }) {
               href="https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/apply-visitor-visa.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[#E8C4B8]/20
-                hover:bg-[#8B9E7E]/5 transition-colors duration-200 group"
+              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[var(--border-20)]
+                hover:bg-[var(--accent-5)] transition-colors duration-200 group"
             >
-              <ExternalLink className="w-4 h-4 text-[#8B9E7E] shrink-0 mt-0.5" />
+              <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
               <div>
-                <span className="text-sm font-medium text-[#3B4A30] group-hover:text-[#8B9E7E] transition-colors duration-200 block">
+                <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">
                   Demande de visa visiteur — IRCC
                 </span>
-                <span className="text-xs text-[#7A6B55]/70">
+                <span className="text-xs text-[var(--text-muted-70)]">
                   Guide officiel pour faire une demande de visa de visiteur au Canada
                 </span>
               </div>
@@ -484,15 +484,15 @@ export default function LetterPreview({ data, onBack }) {
               href="https://www.vfsglobal.ca/canada/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[#E8C4B8]/20
-                hover:bg-[#8B9E7E]/5 transition-colors duration-200 group"
+              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[var(--border-20)]
+                hover:bg-[var(--accent-5)] transition-colors duration-200 group"
             >
-              <ExternalLink className="w-4 h-4 text-[#8B9E7E] shrink-0 mt-0.5" />
+              <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
               <div>
-                <span className="text-sm font-medium text-[#3B4A30] group-hover:text-[#8B9E7E] transition-colors duration-200 block">
+                <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">
                   VFS Global Canada
                 </span>
-                <span className="text-xs text-[#7A6B55]/70">
+                <span className="text-xs text-[var(--text-muted-70)]">
                   Centre de réception des demandes de visa (prise de rendez-vous)
                 </span>
               </div>
@@ -507,11 +507,11 @@ export default function LetterPreview({ data, onBack }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="animated-border bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30 shadow-sm overflow-hidden"
+        className="animated-border bg-[var(--surface)] rounded-2xl border border-[var(--border-30)] shadow-sm overflow-hidden"
       >
-        <div className="bg-[#FDF8F4] border-b border-[#E8C4B8]/30 px-6 py-3.5 flex items-center gap-2">
-          <FileText className="w-4 h-4 text-[#7A6B55]" />
-          <span className="text-xs font-medium text-[#7A6B55] uppercase tracking-wider">
+        <div className="bg-[var(--surface-alt)] border-b border-[var(--border-30)] px-6 py-3.5 flex items-center gap-2">
+          <FileText className="w-4 h-4 text-[var(--text-muted)]" />
+          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
             Aperçu de la lettre
           </span>
         </div>
