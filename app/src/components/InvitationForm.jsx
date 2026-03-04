@@ -1,36 +1,43 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Plane, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileText, X } from 'lucide-react'
 
-function Field({ label, required, helper, children }) {
+function Field({ label, required, helper, error, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-[#5C6B4F] mb-1.5">
+      <label className="block text-sm font-medium text-[#3B4A30] mb-1.5">
         {label}
         {required && <span className="text-[#E8C4B8] ml-0.5">*</span>}
       </label>
       {children}
-      {helper && <p className="text-xs text-[#C4A98A] mt-1.5">{helper}</p>}
+      {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
+      {!error && helper && <p className="text-xs text-[#7A6B55] mt-1.5">{helper}</p>}
     </div>
   )
 }
 
-function Input({ value, onChange, placeholder, type = 'text', required, disabled, ...rest }) {
+function Input({ value, onChange, placeholder, type = 'text', required, disabled, error, ...rest }) {
+  const [touched, setTouched] = useState(false)
+  const showError = touched && error
+
   return (
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onBlur={() => setTouched(true)}
       placeholder={placeholder}
       required={required}
       disabled={disabled}
-      className="w-full rounded-xl bg-[#FFFBF7] border border-[#E8C4B8]/40 px-4 py-2.5 text-sm text-[#5C6B4F]
-        placeholder:text-[#C4A98A]/60
-        focus:border-[#8B9E7E] focus:ring-2 focus:ring-[#8B9E7E]/20
+      aria-invalid={showError ? 'true' : undefined}
+      className={`w-full rounded-xl bg-[#FFFBF7] border px-4 py-2.5 text-sm text-[#3B4A30]
+        placeholder:text-[#7A6B55]/60
+        focus:ring-2 focus:ring-[#8B9E7E]/20
         focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
         transition-all duration-200 outline-none
-        disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled:opacity-50 disabled:cursor-not-allowed
+        ${showError ? 'border-red-400 focus:border-red-400' : 'border-[#E8C4B8]/40 focus:border-[#8B9E7E]'}`}
       {...rest}
     />
   )
@@ -50,7 +57,7 @@ function Section({ icon: Icon, title, children, delay = 0 }) {
         <div className="w-10 h-10 rounded-full bg-[#8B9E7E]/10 flex items-center justify-center shrink-0">
           <Icon className="w-5 h-5 text-[#8B9E7E]" />
         </div>
-        <h3 className="font-display text-lg font-semibold text-[#5C6B4F]">{title}</h3>
+        <h3 className="font-display text-lg font-semibold text-[#3B4A30]">{title}</h3>
       </div>
       <div className="space-y-5">{children}</div>
     </motion.div>
@@ -68,7 +75,7 @@ const defaultForm = {
   arrivalDate: '',
   departureDate: '',
   cityInCanada: 'Montréal (QC)',
-  accommodationAddress: 'Chez Madjdi Rafik Chemli – 267 Rachel Est, Montréal (QC), Canada H2W 1E5',
+  accommodationAddress: 'Chez Madjdi Rafik Chemli – 308-267 Rachel Est, Montréal (QC), Canada H2W 1E5',
   accommodationDatesStart: '',
   accommodationDatesEnd: '',
   returnCountry: '',
@@ -78,50 +85,76 @@ const defaultForm = {
   relationship: '',
 }
 
+const mockForm = {
+  fullName: 'Jean-Mouloud Belkacem',
+  dob: '1990-05-14',
+  nationality: 'Algérienne',
+  address: '42 Rue Didouche Mourad, Alger, Algérie',
+  phone: '+213 5 55 12 34 56',
+  email: 'jm.belkacem@exemple.com',
+  purpose: 'Assister au mariage de Madjdi Rafik Chemli le 19 septembre 2026',
+  arrivalDate: '2026-09-15',
+  departureDate: '2026-09-25',
+  cityInCanada: 'Montréal (QC)',
+  accommodationAddress: 'Chez Madjdi Rafik Chemli – 308-267 Rachel Est, Montréal (QC), Canada H2W 1E5',
+  accommodationDatesStart: '',
+  accommodationDatesEnd: '',
+  returnCountry: 'Algérie',
+  returnReason: 'Emploi permanent à Alger',
+  passportNumber: 'DZ1234567',
+  issuingCountry: 'Algérie',
+  relationship: 'Ami d\'enfance',
+}
+
+const isDev = import.meta.env.DEV
+
 function LetterTemplate() {
   return (
     <div
-      className="text-sm text-[#5C6B4F] leading-[1.85] space-y-3"
-      style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '14px' }}
+      className="text-[#3B4A30] leading-[1.85] space-y-[1em]"
+      style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: 'clamp(1rem, 0.8rem + 0.8vw, 1.35rem)',
+      }}
     >
-      <div className="text-center mb-4">
+      <div className="text-center mb-[1em]">
         <p className="font-semibold">Madjdi Rafik Chemli</p>
-        <p className="text-xs text-[#C4A98A]">267 Rachel Est, Montréal (QC), Canada H2W 1E5</p>
+        <p className="text-[0.85em] text-[#7A6B55]">308-267 Rachel Est, Montréal (QC), Canada H2W 1E5</p>
       </div>
       <div className="h-px bg-[#E8C4B8]/30" />
-      <p className="text-[#C4A98A] text-xs">Date : <span className="italic">[date du jour]</span></p>
-      <p className="text-[#C4A98A] text-xs">À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
-      <p className="font-semibold text-[#5C6B4F]">
-        Objet : Lettre d'invitation — Demande de visa visiteur pour <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[Nom du visiteur]</mark>
+      <p className="text-[#7A6B55] text-[0.85em]">Date : <span className="italic">[date du jour]</span></p>
+      <p className="text-[#7A6B55] text-[0.85em]">À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
+      <p className="font-semibold text-[#3B4A30]">
+        Objet : Lettre d'invitation — Demande de visa visiteur pour <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom du visiteur]</mark>
       </p>
       <div className="h-px bg-[#E8C4B8]/30" />
       <p>
-        Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994, citoyen canadien, résidant au 267 Rachel Est, Montréal (QC), Canada, invite par la présente <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[Nom du visiteur]</mark>, né(e) le <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[date de naissance]</mark>, de nationalité <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[nationalité]</mark>, résidant au <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[adresse]</mark>, téléphone <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[tél]</mark>, courriel <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[courriel]</mark>, à venir au Canada pour un séjour temporaire.
+        Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom du visiteur]</mark>, né(e) le <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date de naissance]</mark>, de nationalité <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[nationalité]</mark>, résidant au <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[adresse]</mark>, téléphone <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[tél]</mark>, courriel <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[courriel]</mark>, à venir au Canada pour un séjour temporaire.
       </p>
       <p className="font-medium text-[#8B9E7E]">
         Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.
       </p>
       <p>
-        Dates prévues du séjour : du <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[date d'arrivée]</mark> au <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[date de départ]</mark> (durée totale : <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[X jours]</mark>).
+        Dates prévues du séjour : du <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date d'arrivée]</mark> au <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date de départ]</mark> (durée totale : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[X jours]</mark>).
       </p>
       <p>
-        Hébergement : <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[Nom]</mark> logera chez moi au 267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur.
+        Hébergement : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur.
       </p>
       <p>
-        Dispositions financières : <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[Nom]</mark> assumera l'ensemble des frais liés à son voyage et à son séjour.
+        Dispositions financières : je prendrai en charge l'hébergement de <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> à mon domicile. <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> assumera les autres frais liés à son voyage.
       </p>
       <p>
-        Départ du Canada : <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[Nom]</mark> quittera le Canada au plus tard le <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[date de départ]</mark> afin de retourner à <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[pays de retour]</mark>.
+        Départ du Canada : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[Nom]</mark> quittera le Canada au plus tard le <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[date de départ]</mark> afin de retourner en <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[pays de retour]</mark>.
       </p>
       <div className="h-px bg-[#E8C4B8]/30" />
-      <div className="text-xs text-[#C4A98A] space-y-0.5">
-        <p>Poste : Senior Data Scientist (EC-05)</p>
-        <p>Employeur : Statistique Canada — CAIRE</p>
-        <p>Lien avec le visiteur : <mark className="bg-[#8B9E7E]/15 text-[#5C6B4F] rounded px-1">[relation]</mark></p>
+      <div className="text-[0.85em] text-[#7A6B55] space-y-[0.25em]">
         <p>Conjointe : Sandrine Martelle, née le 3 février 1995.</p>
+        <p>Lien avec le visiteur : <mark className="bg-[#8B9E7E]/15 text-[#3B4A30] rounded px-1">[relation]</mark></p>
+        <p>Poste : Scientifique principal des données (EC-05)</p>
+        <p>Employeur : Gouvernement du Canada — Statistique Canada — CAIRE (Centre de recherche et d'expertise en IA)</p>
       </div>
       <div className="h-px bg-[#E8C4B8]/30" />
-      <p className="italic text-[#C4A98A]">Cordialement,</p>
+      <p className="italic text-[#7A6B55]">Cordialement,</p>
       <p className="font-semibold">Madjdi Rafik Chemli</p>
     </div>
   )
@@ -130,12 +163,62 @@ function LetterTemplate() {
 export default function InvitationForm({ onSubmit, initialData }) {
   const [form, setForm] = useState(initialData || defaultForm)
   const [showTemplate, setShowTemplate] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const templateTriggerRef = useRef(null)
+  const modalRef = useRef(null)
 
   useEffect(() => {
     if (initialData) setForm(initialData)
   }, [initialData])
 
+  // Focus trap + Escape for modal
+  useEffect(() => {
+    if (!showTemplate) return
+    const el = modalRef.current
+    if (!el) return
+
+    const focusable = () => el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    const first = () => focusable()[0]
+    const last = () => { const f = focusable(); return f[f.length - 1] }
+
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        setShowTemplate(false)
+        return
+      }
+      if (e.key === 'Tab') {
+        const items = focusable()
+        if (items.length === 0) return
+        if (e.shiftKey && document.activeElement === first()) {
+          e.preventDefault()
+          last()?.focus()
+        } else if (!e.shiftKey && document.activeElement === last()) {
+          e.preventDefault()
+          first()?.focus()
+        }
+      }
+    }
+
+    // Focus the close button on open
+    requestAnimationFrame(() => first()?.focus())
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [showTemplate])
+
+  // Return focus to trigger when modal closes
+  const closeTemplate = useCallback(() => {
+    setShowTemplate(false)
+    requestAnimationFrame(() => templateTriggerRef.current?.focus())
+  }, [])
+
   const set = (key) => (val) => setForm((f) => ({ ...f, [key]: val }))
+
+  const validate = (key) => {
+    const v = form[key]
+    if (!v || (typeof v === 'string' && !v.trim())) return 'Ce champ est requis'
+    if (key === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Courriel invalide'
+    return ''
+  }
 
   const duration = () => {
     if (!form.arrivalDate || !form.departureDate) return ''
@@ -147,35 +230,55 @@ export default function InvitationForm({ onSubmit, initialData }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    setSubmitted(true)
+    const requiredFields = ['fullName', 'dob', 'nationality', 'address', 'phone', 'email', 'arrivalDate', 'departureDate', 'returnCountry', 'returnReason', 'relationship']
+    const hasErrors = requiredFields.some((k) => validate(k))
+    if (hasErrors) return
     onSubmit({ ...form, duration: duration() })
+  }
+
+  const fillMock = () => {
+    setForm(mockForm)
+    setSubmitted(false)
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {isDev && (
+        <button
+          type="button"
+          onClick={fillMock}
+          className="w-full rounded-xl border-2 border-dashed border-amber-400/60 bg-amber-50 px-4 py-2.5
+            text-sm font-medium text-amber-700 hover:bg-amber-100
+            transition-colors duration-150 cursor-pointer"
+        >
+          DEV — Remplir avec des données fictives
+        </button>
+      )}
       {/* 1. Visitor Identity */}
       <Section icon={User} title="1. Identité du visiteur" delay={0}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="sm:col-span-2">
-            <Field label="Nom complet (tel que sur le passeport)" required>
-              <Input value={form.fullName} onChange={set('fullName')} placeholder="Jean Dupont" required />
+            <Field label="Nom complet (tel que sur le passeport)" required error={submitted && validate('fullName')}>
+              <Input value={form.fullName} onChange={set('fullName')} placeholder="Jean-Mouloud Belkacem" required error={submitted && validate('fullName')} autoComplete="name" />
             </Field>
           </div>
-          <Field label="Date de naissance" required helper="Format AAAA-MM-JJ">
-            <Input type="date" value={form.dob} onChange={set('dob')} required />
+          <Field label="Date de naissance" required helper="Format AAAA-MM-JJ" error={submitted && validate('dob')}>
+            <Input type="date" value={form.dob} onChange={set('dob')} required error={submitted && validate('dob')} autoComplete="bday" />
           </Field>
-          <Field label="Nationalité" required>
-            <Input value={form.nationality} onChange={set('nationality')} placeholder="Française" required />
+          <Field label="Nationalité" required error={submitted && validate('nationality')}>
+            <Input value={form.nationality} onChange={set('nationality')} placeholder="Algérienne" required error={submitted && validate('nationality')} />
           </Field>
         </div>
-        <Field label="Adresse résidentielle complète" required>
-          <Input value={form.address} onChange={set('address')} placeholder="123 Rue Exemple, Paris, France" required />
+        <Field label="Adresse résidentielle complète" required error={submitted && validate('address')}>
+          <Input value={form.address} onChange={set('address')} placeholder="42 Rue Didouche Mourad, Alger, Algérie" required error={submitted && validate('address')} autoComplete="street-address" />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="Téléphone" required>
-            <Input type="tel" value={form.phone} onChange={set('phone')} placeholder="+33 6 12 34 56 78" required />
+          <Field label="Téléphone" required error={submitted && validate('phone')}>
+            <Input type="tel" value={form.phone} onChange={set('phone')} placeholder="+213 5 55 12 34 56" required error={submitted && validate('phone')} autoComplete="tel" />
           </Field>
-          <Field label="Courriel" required>
-            <Input type="email" value={form.email} onChange={set('email')} placeholder="jean@exemple.com" required />
+          <Field label="Courriel" required error={submitted && validate('email')}>
+            <Input type="email" value={form.email} onChange={set('email')} placeholder="jm.belkacem@exemple.com" required error={submitted && validate('email')} autoComplete="email" />
           </Field>
         </div>
       </Section>
@@ -186,11 +289,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
           <Input value={form.purpose} onChange={set('purpose')} disabled />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <Field label="Date d'arrivée" required>
-            <Input type="date" value={form.arrivalDate} onChange={set('arrivalDate')} required />
+          <Field label="Date d'arrivée" required error={submitted && validate('arrivalDate')}>
+            <Input type="date" value={form.arrivalDate} onChange={set('arrivalDate')} required error={submitted && validate('arrivalDate')} />
           </Field>
-          <Field label="Date de départ" required>
-            <Input type="date" value={form.departureDate} onChange={set('departureDate')} required />
+          <Field label="Date de départ" required error={submitted && validate('departureDate')}>
+            <Input type="date" value={form.departureDate} onChange={set('departureDate')} required error={submitted && validate('departureDate')} />
           </Field>
           <Field label="Durée totale" helper="Calculée automatiquement">
             <Input value={duration()} disabled placeholder="—" />
@@ -219,11 +322,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
       {/* 4. Return */}
       <Section icon={RotateCcw} title="4. Retour après la visite" delay={0.15}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="Pays de retour" required>
-            <Input value={form.returnCountry} onChange={set('returnCountry')} placeholder="France" required />
+          <Field label="Pays de retour" required error={submitted && validate('returnCountry')}>
+            <Input value={form.returnCountry} onChange={set('returnCountry')} placeholder="Algérie" required error={submitted && validate('returnCountry')} autoComplete="country-name" />
           </Field>
-          <Field label="Raison principale du retour" required>
-            <Input value={form.returnReason} onChange={set('returnReason')} placeholder="Emploi permanent" required />
+          <Field label="Raison principale du retour" required error={submitted && validate('returnReason')}>
+            <Input value={form.returnReason} onChange={set('returnReason')} placeholder="Emploi permanent à Alger" required error={submitted && validate('returnReason')} />
           </Field>
         </div>
       </Section>
@@ -232,18 +335,37 @@ export default function InvitationForm({ onSubmit, initialData }) {
       <Section icon={BookOpen} title="5. Passeport (optionnel)" delay={0.2}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Numéro de passeport">
-            <Input value={form.passportNumber} onChange={set('passportNumber')} placeholder="AB1234567" />
+            <Input value={form.passportNumber} onChange={set('passportNumber')} placeholder="DZ1234567" />
           </Field>
           <Field label="Pays de délivrance">
-            <Input value={form.issuingCountry} onChange={set('issuingCountry')} placeholder="France" />
+            <Input value={form.issuingCountry} onChange={set('issuingCountry')} placeholder="Algérie" />
           </Field>
         </div>
       </Section>
 
       {/* 6. Relationship */}
       <Section icon={Users} title="6. Lien avec l'hôte" delay={0.25}>
-        <Field label="Relation avec Madjdi Rafik Chemli" required>
-          <Input value={form.relationship} onChange={set('relationship')} placeholder="Cousin, ami, collègue..." required />
+        <Field label="Relation avec Madjdi Rafik Chemli" required error={submitted && validate('relationship')}>
+          <select
+            value={form.relationship}
+            onChange={(e) => set('relationship')(e.target.value)}
+            required
+            className={`w-full rounded-xl bg-[#FFFBF7] border px-4 py-2.5 text-sm text-[#3B4A30]
+              focus:ring-2 focus:ring-[#8B9E7E]/20
+              focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
+              transition-all duration-200 outline-none cursor-pointer appearance-none
+              ${!form.relationship ? 'text-[#7A6B55]/60' : ''}
+              ${submitted && validate('relationship') ? 'border-red-400' : 'border-[#E8C4B8]/40 focus:border-[#8B9E7E]'}`}
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A6B55' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+          >
+            <option value="" disabled>Choisir le lien...</option>
+            <option value="Ami d'enfance">Ami d'enfance</option>
+            <option value="Ami proche">Ami proche</option>
+            <option value="Cousin / Cousine">Cousin / Cousine</option>
+            <option value="Oncle / Tante">Oncle / Tante</option>
+<option value="Collègue">Collègue</option>
+            <option value="Autre membre de la famille">Autre membre de la famille</option>
+          </select>
         </Field>
       </Section>
 
@@ -255,10 +377,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <button
+          ref={templateTriggerRef}
           type="button"
           onClick={() => setShowTemplate(true)}
           className="w-full flex items-center justify-center gap-2 bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30
-            px-6 py-4 text-sm font-medium text-[#5C6B4F] hover:bg-[#FDF8F4] hover:shadow-sm
+            px-6 py-4 text-sm font-medium text-[#3B4A30] hover:bg-[#FDF8F4] hover:shadow-sm
             focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
             transition-all duration-200 cursor-pointer"
         >
@@ -271,52 +394,69 @@ export default function InvitationForm({ onSubmit, initialData }) {
       {createPortal(
         <AnimatePresence>
           {showTemplate && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-sm"
-              onClick={() => setShowTemplate(false)}
-            >
+            <>
+              {/* Backdrop — click to dismiss */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="relative w-full max-w-2xl mx-4 my-8 sm:my-12 bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30 shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
+                onClick={closeTemplate}
+              />
+
+              {/* Bottom sheet */}
+              <motion.div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Modèle de lettre"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                className="fixed inset-x-0 bottom-0 z-[101] flex flex-col bg-[#FFFBF7] rounded-t-3xl shadow-2xl overflow-hidden"
+                style={{ maxHeight: '90vh' }}
               >
-                {/* Modal header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-[#FFFBF7] border-b border-[#E8C4B8]/30 rounded-t-2xl">
+                {/* Drag handle */}
+                <div className="flex justify-center pt-3 pb-1">
+                  <div className="w-10 h-1 rounded-full bg-[#E8C4B8]/50" />
+                </div>
+
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-[#E8C4B8]/30" style={{ padding: 'clamp(0.5rem, 1vw, 0.75rem) clamp(1.5rem, 4vw, 4rem)' }}>
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4 text-[#8B9E7E]" />
-                    <h3 className="font-display text-base font-semibold text-[#5C6B4F]">Modèle de lettre</h3>
+                    <h3 className="font-display font-semibold text-[#3B4A30]" style={{ fontSize: 'clamp(1rem, 0.8rem + 0.6vw, 1.25rem)' }}>Modèle de lettre</h3>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setShowTemplate(false)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#E8C4B8]/20
+                    onClick={closeTemplate}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E8C4B8]/20
                       focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
                       transition-colors duration-200 cursor-pointer"
                     aria-label="Fermer"
                   >
-                    <X className="w-4 h-4 text-[#5C6B4F]" />
+                    <X className="w-5 h-5 text-[#3B4A30]" />
                   </button>
                 </div>
 
-                {/* Modal body */}
-                <div className="px-6 sm:px-10 py-8">
-                  <div className="flex items-center gap-2 mb-6">
+                {/* Scrollable letter content */}
+                <div className="flex-1 overflow-y-auto">
+                  <div className="flex justify-center" style={{ padding: 'clamp(1.5rem, 4vw, 4rem)' }}>
+                    <div className="w-full" style={{ maxWidth: 'clamp(24rem, 55vw, 52rem)' }}>
+                  <div className="flex items-center gap-2 mb-[2em]">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#8B9E7E]" />
-                    <p className="text-xs text-[#C4A98A] uppercase tracking-wider font-medium">
+                    <p className="text-[0.85em] text-[#7A6B55] uppercase tracking-wider font-medium" style={{ fontSize: 'clamp(0.75rem, 0.6rem + 0.5vw, 1rem)' }}>
                       Les champs surlignés seront remplis avec vos informations
                     </p>
                   </div>
                   <LetterTemplate />
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
+            </>
           )}
         </AnimatePresence>,
         document.body

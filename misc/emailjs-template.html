@@ -1,0 +1,124 @@
+<div style="font-family:system-ui,sans-serif,Arial;font-size:14px;color:#333;padding:14px 8px;background-color:#FDF8F4">
+  <div style="max-width:600px;margin:auto;background-color:#FFFBF7;border-radius:12px;overflow:hidden;border:1px solid #E8C4B8">
+
+    <!-- Header -->
+    <div style="border-top:6px solid #8B9E7E;padding:20px 24px;background-color:#FFFBF7">
+      <span style="font-size:20px;vertical-align:middle">&#x2764;</span>
+      <span style="font-size:16px;vertical-align:middle;border-left:1px solid #C4A98A;padding-left:10px;margin-left:8px;color:#5C6B4F">
+        <strong>Nouvelle lettre d'invitation générée</strong>
+      </span>
+    </div>
+
+    <div style="padding:0 24px 24px">
+      <p style="color:#5C6B4F;margin:0 0 16px">
+        Un invité vient de générer sa lettre d'invitation IRCC depuis le site du mariage.
+      </p>
+
+      <!-- Guest name banner -->
+      <div style="background-color:#8B9E7E;color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:20px">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;margin-bottom:4px">Invité</div>
+        <div style="font-size:20px;font-weight:600">{{guest_name}}</div>
+        <div style="font-size:13px;opacity:0.85;margin-top:2px">{{guest_relationship}}</div>
+      </div>
+
+      <!-- Visitor details -->
+      <div style="font-size:14px;padding-bottom:4px;border-bottom:2px solid #5C6B4F;margin-bottom:2px;color:#5C6B4F">
+        <strong>Identité du visiteur</strong>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Nom</td>
+          <td style="padding:8px 12px;color:#333"><strong>{{guest_name}}</strong></td>
+        </tr>
+        <tr style="background-color:#FDF8F4">
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Date de naissance</td>
+          <td style="padding:8px 12px;color:#333">{{guest_dob}}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Nationalité</td>
+          <td style="padding:8px 12px;color:#333">{{guest_nationality}}</td>
+        </tr>
+        <tr style="background-color:#FDF8F4">
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Adresse</td>
+          <td style="padding:8px 12px;color:#333">{{guest_address}}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Téléphone</td>
+          <td style="padding:8px 12px;color:#333">{{guest_phone}}</td>
+        </tr>
+        <tr style="background-color:#FDF8F4">
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Courriel</td>
+          <td style="padding:8px 12px;color:#333"><a href="mailto:{{guest_email}}" style="color:#8B9E7E">{{guest_email}}</a></td>
+        </tr>
+        {{#guest_passport}}
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Passeport</td>
+          <td style="padding:8px 12px;color:#333">{{guest_passport}}</td>
+        </tr>
+        {{/guest_passport}}
+      </table>
+
+      <div style="height:20px"></div>
+
+      <!-- Travel details -->
+      <div style="font-size:14px;padding-bottom:4px;border-bottom:2px solid #5C6B4F;margin-bottom:2px;color:#5C6B4F">
+        <strong>Détails du voyage</strong>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Arrivée</td>
+          <td style="padding:8px 12px;color:#333">{{arrival_date}}</td>
+        </tr>
+        <tr style="background-color:#FDF8F4">
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Départ</td>
+          <td style="padding:8px 12px;color:#333">{{departure_date}}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Durée</td>
+          <td style="padding:8px 12px;color:#333"><strong>{{duration}}</strong></td>
+        </tr>
+        <tr style="background-color:#FDF8F4">
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Hébergement</td>
+          <td style="padding:8px 12px;color:#333">{{accommodation_address}}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Dates héberg.</td>
+          <td style="padding:8px 12px;color:#333">{{accommodation_dates}}</td>
+        </tr>
+      </table>
+
+      <div style="height:20px"></div>
+
+      <!-- Return -->
+      <div style="font-size:14px;padding-bottom:4px;border-bottom:2px solid #5C6B4F;margin-bottom:2px;color:#5C6B4F">
+        <strong>Retour</strong>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <tr>
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Pays de retour</td>
+          <td style="padding:8px 12px;color:#333">{{return_country}}</td>
+        </tr>
+        <tr style="background-color:#FDF8F4">
+          <td style="padding:8px 12px;color:#8B9E7E;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;white-space:nowrap">Raison</td>
+          <td style="padding:8px 12px;color:#333">{{return_reason}}</td>
+        </tr>
+      </table>
+
+      <div style="height:20px"></div>
+
+      <!-- Timestamp -->
+      <div style="border-top:2px solid #E8C4B8;padding-top:16px;text-align:center">
+        <span style="display:inline-block;background-color:#8B9E7E;color:#fff;font-size:12px;padding:6px 16px;border-radius:20px;letter-spacing:0.5px">
+          Lettre générée le {{generated_date}} à {{generated_time}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:600px;margin:auto;padding:16px 0">
+    <p style="color:#C4A98A;font-size:12px;text-align:center;margin:0">
+      Mariage Sandrine &amp; Rafik — 19 septembre 2026 — Montréal<br>
+      Notification automatique du générateur de lettres d'invitation
+    </p>
+  </div>
+</div>

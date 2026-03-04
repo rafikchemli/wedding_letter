@@ -19,10 +19,10 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 ::selection {
   background: rgba(232, 196, 184, 0.4);
-  color: #5C6B4F;
+  color: #3B4A30;
 }
 
-/* ─── Animated border — blush/sage conic gradient ─── */
+/* ─── Animated border — two snakes chasing each other ─── */
 @keyframes spin-border {
   to { transform: rotate(360deg); }
 }
@@ -36,18 +36,26 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .animated-border::before {
   content: '';
   position: absolute;
-  inset: -2px;
   z-index: -1;
+  top: 50%;
+  left: 50%;
+  /* Square that always covers the card diagonally while spinning */
+  width: max(200%, 200vh);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  /* Two opposing snakes — seamless at 0°/360° */
   background: conic-gradient(
     from 0deg,
-    #8B9E7E,
-    #E8C4B8,
-    #FDF8F4,
-    #E8C4B8,
-    #8B9E7E
+    transparent 0deg,
+    #8B9E7E 30deg,
+    #E8C4B8 60deg,
+    transparent 90deg,
+    transparent 180deg,
+    #8B9E7E 210deg,
+    #E8C4B8 240deg,
+    transparent 270deg
   );
-  border-radius: inherit;
-  animation: spin-border 6s linear infinite;
+  animation: spin-border 4s linear infinite;
 }
 
 .animated-border::after {
@@ -102,7 +110,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #C4A98A;
+  color: #7A6B55;
 }
 
 .ornament::before,
@@ -116,4 +124,18 @@ h1, h2, h3, h4, h5, h6, .font-display {
 /* ─── Calligraphy font for names ─── */
 .font-calligraphy {
   font-family: 'Great Vibes', cursive;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .petal {
+    animation: none !important;
+    display: none;
+  }
+  .animated-border::before {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }

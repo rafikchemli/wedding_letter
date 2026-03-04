@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate, MotionConfig, useReducedMotion } from 'framer-motion'
 import { Heart, FileText, ChevronRight, ChevronDown } from 'lucide-react'
 import InvitationForm from './components/InvitationForm'
 import LetterPreview from './components/LetterPreview'
@@ -20,12 +20,26 @@ const photos = [
 ]
 
 function FloatingPetals() {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handler = () => {
+      if (!ref.current) return
+      const state = document.hidden ? 'paused' : 'running'
+      ref.current.querySelectorAll('.petal').forEach((el) => {
+        el.style.animationPlayState = state
+      })
+    }
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [])
+
   return (
-    <>
+    <div ref={ref}>
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="petal" />
       ))}
-    </>
+    </div>
   )
 }
 
@@ -81,6 +95,7 @@ function PhotoGallery() {
             <img
               src={photo.src}
               alt={photo.alt}
+              loading="lazy"
               className="w-full h-full object-cover"
             />
             {/* Soft overlay at bottom */}
@@ -142,6 +157,7 @@ function App() {
   }
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen bg-[#FDF8F4] relative overflow-x-hidden">
       <FloatingPetals />
 
@@ -165,10 +181,10 @@ function App() {
               <Heart className="w-5 h-5 text-[#8B9E7E]" />
             </div>
             <div className="text-left">
-              <h1 className="text-sm font-display font-semibold text-[#5C6B4F] leading-tight tracking-wide">
+              <h1 className="text-sm font-display font-semibold text-[#3B4A30] leading-tight tracking-wide">
                 Sandrine & Rafik
               </h1>
-              <p className="text-xs text-[#C4A98A]">19 septembre 2026</p>
+              <p className="text-xs text-[#7A6B55]">19 septembre 2026</p>
             </div>
           </button>
 
@@ -186,8 +202,8 @@ function App() {
                     i === currentStep
                       ? 'text-white'
                       : i < currentStep
-                        ? 'text-[#5C6B4F]'
-                        : 'text-[#C4A98A]'
+                        ? 'text-[#3B4A30]'
+                        : 'text-[#7A6B55]'
                   }`}
                 >
                   {i === currentStep && (
@@ -205,13 +221,13 @@ function App() {
                   )}
                   <span className="relative z-10">{step.label}</span>
                 </button>
-                {i < steps.length - 1 && <ChevronRight className="w-3.5 h-3.5 text-[#C4A98A]" />}
+                {i < steps.length - 1 && <ChevronRight className="w-3.5 h-3.5 text-[#7A6B55]" />}
               </div>
             ))}
           </div>
 
           {/* Mobile step counter */}
-          <div className="sm:hidden text-xs font-medium text-[#C4A98A]">
+          <div className="sm:hidden text-xs font-medium text-[#7A6B55]">
             {currentStep + 1}/{steps.length}
           </div>
         </div>
@@ -219,7 +235,7 @@ function App() {
 
       {/* Hero section with photo background */}
       {currentStep === 0 && (
-        <section className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden snap-start">
+        <section className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden snap-start">
           {/* Background photo */}
           <div className="absolute inset-0 z-0">
             <img
@@ -286,7 +302,7 @@ function App() {
             >
               <OrnamentalDivider className="mb-8 max-w-xs mx-auto" />
 
-              <p className="text-sm text-[#4A3628]/50 max-w-md mx-auto leading-relaxed mb-8 drop-shadow-sm">
+              <p className="text-sm text-[#4A3628]/50 max-w-md mx-auto leading-relaxed mb-8 drop-shadow-sm text-pretty">
                 Générez votre lettre d'invitation officielle IRCC
                 pour votre demande de visa visiteur au Canada.
               </p>
@@ -347,14 +363,14 @@ function App() {
                   viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B9E7E]/10 text-[#5C6B4F] text-xs font-medium tracking-wider uppercase mb-5">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B9E7E]/10 text-[#3B4A30] text-xs font-medium tracking-wider uppercase mb-5">
                     <FileText className="w-3.5 h-3.5" />
                     Lettre d'invitation IRCC
                   </div>
-                  <h2 className="font-display text-3xl sm:text-4xl font-semibold text-[#5C6B4F] mb-4 leading-[1.2]">
+                  <h2 className="font-display text-3xl sm:text-4xl font-semibold text-[#3B4A30] mb-4 leading-[1.2] text-balance">
                     Générez votre lettre d'invitation
                   </h2>
-                  <p className="text-base text-[#8B9E7E]/70 max-w-lg mx-auto leading-relaxed">
+                  <p className="text-base text-[#5C6B4F] max-w-lg mx-auto leading-relaxed text-pretty">
                     Remplissez le formulaire ci-dessous pour générer une lettre officielle
                     pour votre demande de visa visiteur au Canada.
                   </p>
@@ -376,11 +392,12 @@ function App() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-[#E8C4B8]/30 py-10 text-center">
         <OrnamentalDivider className="max-w-xs mx-auto mb-6" />
-        <p className="font-display text-sm text-[#C4A98A] italic tracking-wide">
+        <p className="font-display text-sm text-[#7A6B55] italic tracking-wide">
           Mariage Sandrine & Rafik — 19 septembre 2026 — Montréal
         </p>
       </footer>
     </div>
+    </MotionConfig>
   )
 }
 
