@@ -109,6 +109,47 @@ h1, h2, h3, h4, h5, h6, .font-display {
   background: linear-gradient(to right, transparent, #E8C4B8, transparent);
 }
 
+/* ─── Calligraphy font for names ─── */
+.font-calligraphy {
+  font-family: 'Great Vibes', cursive;
+}
+
+/* ─── Quill ink glow on each letter ─── */
+@keyframes ink-glow {
+  0% { text-shadow: 0 0 0 transparent; }
+  40% { text-shadow: 0 0 12px rgba(212, 175, 55, 0.5), 0 0 24px rgba(212, 175, 55, 0.2); }
+  100% { text-shadow: none; }
+}
+
+.calligraphy-letter {
+  display: inline-block;
+  animation: ink-glow 1.8s ease-out forwards;
+}
+
+/* ─── Gold foil shimmer for dates ─── */
+@keyframes gold-foil {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-foil {
+  background: linear-gradient(
+    105deg,
+    #C49A2E 0%,
+    #D4AF37 20%,
+    #F5E6A3 40%,
+    #FFFAD4 50%,
+    #F5E6A3 60%,
+    #D4AF37 80%,
+    #C49A2E 100%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gold-foil 5s ease-in-out infinite;
+}
+
 /* ─── Shimmer effect for accents ─── */
 @keyframes shimmer {
   0% { background-position: -200% center; }

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, FileText, ChevronRight, ChevronDown } from 'lucide-react'
 import InvitationForm from './components/InvitationForm'
 import LetterPreview from './components/LetterPreview'
+import { notifyHost } from './emailService'
 import './index.css'
 
 const steps = [
@@ -28,39 +29,44 @@ function FloatingPetals() {
   )
 }
 
-const letterContainer = {
+const calligraphyContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.25, delayChildren: 0.1 },
   },
 }
 
-const letterChild = {
-  hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
+const calligraphyChild = {
+  hidden: { opacity: 0, y: 12, scaleY: 0.3, scaleX: 0.7, filter: 'blur(6px)' },
   visible: {
     opacity: 1,
     y: 0,
+    scaleY: 1,
+    scaleX: 1,
     filter: 'blur(0px)',
-    transition: { duration: 0.4, ease: 'easeOut' },
+    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
   },
 }
 
 function AnimatedName({ text, delay = 0, className: cls = '' }) {
   return (
     <motion.h2
-      variants={letterContainer}
+      variants={calligraphyContainer}
       initial="hidden"
       animate="visible"
       transition={{ delayChildren: delay }}
-      className={cls}
+      className={`font-calligraphy ${cls}`}
       aria-label={text}
     >
       {text.split('').map((char, i) => (
         <motion.span
           key={i}
-          variants={letterChild}
-          className="inline-block"
-          style={{ minWidth: char === ' ' ? '0.25em' : undefined }}
+          variants={calligraphyChild}
+          className="calligraphy-letter"
+          style={{
+            minWidth: char === ' ' ? '0.3em' : undefined,
+            transformOrigin: 'bottom left',
+          }}
         >
           {char}
         </motion.span>
@@ -129,6 +135,7 @@ function App() {
     setFormData(data)
     setCurrentStep(1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    notifyHost(data)
   }
 
   const handleBack = () => {
@@ -161,7 +168,7 @@ function App() {
             </div>
             <div>
               <h1 className="text-sm font-display font-semibold text-[#5C6B4F] leading-tight tracking-wide">
-                Rafik & Sandrine
+                Sandrine & Rafik
               </h1>
               <p className="text-xs text-[#C4A98A]">19 septembre 2026</p>
             </div>
@@ -240,32 +247,32 @@ function App() {
 
             <div>
               <AnimatedName
-                text="Rafik"
+                text="Sandrine"
                 delay={0.4}
-                className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] mb-2 drop-shadow-sm"
+                className="text-5xl sm:text-7xl text-[#5C6B4F] leading-[1.1] mb-2 drop-shadow-sm"
               />
               <motion.div
                 initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 0.9, ease: 'easeOut' }}
+                transition={{ duration: 0.6, delay: 2.8, ease: 'easeOut' }}
                 className="ornament text-2xl my-3 text-[#8B9E7E] font-display italic"
               >
                 &
               </motion.div>
               <AnimatedName
-                text="Sandrine"
-                delay={1.1}
-                className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] drop-shadow-sm"
+                text="Rafik"
+                delay={3.2}
+                className="text-5xl sm:text-7xl text-[#5C6B4F] leading-[1.1] drop-shadow-sm"
               />
             </div>
 
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              transition={{ duration: 0.8, delay: 5.0 }}
               className="mt-8 space-y-2"
             >
-              <p className="text-base text-[#5C6B4F] font-medium tracking-wide drop-shadow-sm">
+              <p className="gold-foil text-lg text-[#5C6B4F] font-display font-semibold tracking-wide drop-shadow-sm">
                 19 septembre 2026
               </p>
               <p className="text-sm text-[#5C6B4F]/70 drop-shadow-sm">
@@ -276,7 +283,7 @@ function App() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.2 }}
+              transition={{ duration: 0.6, delay: 5.6 }}
               className="mt-12"
             >
               <OrnamentalDivider className="mb-8 max-w-xs mx-auto" />
@@ -290,7 +297,7 @@ function App() {
                 onClick={scrollToForm}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="animated-border bg-[#8B9E7E] text-white rounded-full px-8 py-3.5 text-sm font-medium
+                className="bg-[#8B9E7E] text-white rounded-full px-8 py-3.5 text-sm font-medium
                   hover:bg-[#7A8E6D] shadow-lg hover:shadow-xl
                   focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
                   transition-all duration-300 inline-flex items-center gap-2 cursor-pointer"
@@ -304,7 +311,7 @@ function App() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 2, duration: 0.6 }}
+              transition={{ delay: 6.5, duration: 0.6 }}
               className="mt-16"
             >
               <motion.div
@@ -382,7 +389,7 @@ function App() {
       <footer className="relative z-10 border-t border-[#E8C4B8]/30 py-10 text-center">
         <OrnamentalDivider className="max-w-xs mx-auto mb-6" />
         <p className="font-display text-sm text-[#C4A98A] italic tracking-wide">
-          Mariage Rafik & Sandrine — 19 septembre 2026 — Montréal
+          Mariage Sandrine & Rafik — 19 septembre 2026 — Montréal
         </p>
       </footer>
     </div>

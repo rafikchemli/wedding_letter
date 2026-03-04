@@ -208,7 +208,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="animated-border w-full sm:w-auto bg-[#8B9E7E] text-white rounded-full px-8 py-3 text-sm font-medium
+          className="w-full sm:w-auto bg-[#8B9E7E] text-white rounded-full px-8 py-3 text-sm font-medium
             hover:bg-[#7A8E6D] shadow-md hover:shadow-lg
             focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
             transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"

@@ -68,9 +68,12 @@ async function downloadDocx(d) {
 
 async function downloadPdf(d) {
   const html2pdf = (await import('html2pdf.js')).default
-  const el = document.getElementById('letter-content')
-  if (!el) return
-  html2pdf()
+  const text = generateLetterText(d)
+  const el = document.createElement('div')
+  el.style.cssText = 'font-family: Times New Roman, Georgia, serif; font-size: 14px; line-height: 1.7; color: #333; padding: 20px; max-width: 680px; white-space: pre-wrap;'
+  el.textContent = text
+  document.body.appendChild(el)
+  await html2pdf()
     .set({
       margin: [15, 15, 15, 15],
       filename: `invitation_${d.fullName.replace(/\s+/g, '_')}.pdf`,
@@ -79,6 +82,7 @@ async function downloadPdf(d) {
     })
     .from(el)
     .save()
+  document.body.removeChild(el)
 }
 
 function OrnamentalDivider({ className = '' }) {
@@ -89,9 +93,115 @@ function OrnamentalDivider({ className = '' }) {
   )
 }
 
-export default function LetterPreview({ data, onBack }) {
-  const letterText = generateLetterText(data)
+function LetterDivider() {
+  return (
+    <div className="flex items-center gap-3 my-5">
+      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E8C4B8]/50 to-transparent" />
+    </div>
+  )
+}
 
+function StyledLetterPreview({ data }) {
+  const d = data
+  const today = new Date().toISOString().split('T')[0]
+  const passportLine = d.passportNumber
+    ? `, passeport no ${d.passportNumber} (délivré par ${d.issuingCountry || '—'})`
+    : ''
+  const accomDates =
+    d.accommodationDatesStart && d.accommodationDatesEnd
+      ? ` (ou du ${d.accommodationDatesStart} au ${d.accommodationDatesEnd} si différent)`
+      : ''
+
+  return (
+    <div className="space-y-0">
+      {/* Sender header */}
+      <div className="text-center mb-8">
+        <h3 className="font-calligraphy text-3xl text-[#5C6B4F] mb-2">Madjdi Rafik Chemli</h3>
+        <p className="text-xs text-[#C4A98A] tracking-wider uppercase">
+          267 Rachel Est, Montréal (QC), Canada H2W 1E5
+        </p>
+      </div>
+
+      <LetterDivider />
+
+      {/* Date & addressee */}
+      <div className="text-sm text-[#5C6B4F]/70 space-y-1 mb-6">
+        <p>Date : {today}</p>
+        <p>À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
+      </div>
+
+      {/* Subject */}
+      <div className="bg-[#8B9E7E]/5 border-l-3 border-[#8B9E7E] rounded-r-lg px-4 py-3 mb-6">
+        <p className="font-display text-base font-semibold text-[#5C6B4F]">
+          Objet : Lettre d'invitation — Demande de visa visiteur pour {d.fullName}
+        </p>
+      </div>
+
+      {/* Body paragraphs */}
+      <div className="space-y-4 text-sm text-[#5C6B4F] leading-[1.85]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '15px' }}>
+        <p>
+          Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994, citoyen canadien, résidant au 267 Rachel Est, Montréal (QC), Canada, invite par la présente <strong className="text-[#5C6B4F]">{d.fullName}</strong>, né(e) le {d.dob}, de nationalité {d.nationality}, résidant au {d.address}, téléphone {d.phone}, courriel {d.email}{passportLine}, à venir au Canada pour un séjour temporaire.
+        </p>
+
+        <p className="font-medium text-[#8B9E7E]">
+          Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.
+        </p>
+
+        <p>
+          Dates prévues du séjour : du <strong>{d.arrivalDate}</strong> au <strong>{d.departureDate}</strong> (durée totale : {d.duration}).
+        </p>
+        <p>
+          Hébergement : {d.fullName} logera chez moi au 267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur, pendant la durée du séjour{accomDates}.
+        </p>
+
+        <p>
+          Dispositions financières : {d.fullName} assumera l'ensemble des frais liés à son voyage et à son séjour, incluant notamment le billet d'avion, le transport local, la nourriture, l'assurance voyage et les dépenses personnelles.
+        </p>
+
+        <p>
+          Départ du Canada : {d.fullName} quittera le Canada au plus tard le {d.departureDate} afin de retourner à {d.returnCountry}.
+        </p>
+
+        <LetterDivider />
+
+        {/* Professional info block */}
+        <div className="bg-[#FDF8F4] rounded-xl p-4 border border-[#E8C4B8]/20">
+          <p className="font-display font-semibold text-[#5C6B4F] mb-2">Mes informations professionnelles :</p>
+          <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+            <span className="text-[#C4A98A]">Poste</span>
+            <span>Senior Data Scientist (EC-05)</span>
+            <span className="text-[#C4A98A]">Employeur</span>
+            <span>Statistique Canada — CAIRE</span>
+            <span className="text-[#C4A98A]">Ville</span>
+            <span>Montréal</span>
+          </div>
+        </div>
+
+        <p>Lien avec le visiteur : <strong>{d.relationship}</strong>.</p>
+
+        {/* Family details */}
+        <div className="bg-[#FDF8F4] rounded-xl p-4 border border-[#E8C4B8]/20">
+          <p className="font-display font-semibold text-[#5C6B4F] mb-2">Détails de ma famille :</p>
+          <p className="text-sm">Conjointe : Sandrine Martelle, née le 3 février 1995.</p>
+        </div>
+
+        <p>
+          Je confirme que les informations ci-dessus sont exactes et fournies à l'appui de la demande de visa visiteur de {d.fullName}.
+        </p>
+
+        <LetterDivider />
+
+        {/* Signature */}
+        <div className="pt-2">
+          <p className="text-[#C4A98A] italic mb-3">Cordialement,</p>
+          <p className="font-calligraphy text-2xl text-[#5C6B4F]">Madjdi Rafik Chemli</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function LetterPreview({ data, onBack }) {
   return (
     <div className="space-y-6">
       {/* Success banner */}
@@ -162,7 +272,7 @@ export default function LetterPreview({ data, onBack }) {
 
       <OrnamentalDivider className="max-w-xs mx-auto" />
 
-      {/* Letter preview card */}
+      {/* Styled letter preview card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -176,14 +286,11 @@ export default function LetterPreview({ data, onBack }) {
             Aperçu de la lettre
           </span>
         </div>
-        <div
-          id="letter-content"
-          className="p-6 sm:p-10 text-sm text-[#5C6B4F] leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "'Times New Roman', Georgia, serif", lineHeight: 1.7 }}
-        >
-          {letterText}
+        <div className="p-6 sm:p-10">
+          <StyledLetterPreview data={data} />
         </div>
       </motion.div>
+
     </div>
   )
 }
