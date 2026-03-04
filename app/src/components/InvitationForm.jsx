@@ -1,18 +1,25 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Children, isValidElement, cloneElement } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Plane, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileText, X } from 'lucide-react'
 
 function Field({ label, required, helper, error, children }) {
+  const descId = `desc-${label.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
+  const hasDesc = !!(error || helper)
+
   return (
     <div>
       <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
         {label}
-        {required && <span className="text-[var(--border)] ml-0.5">*</span>}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
-      {children}
-      {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
-      {!error && helper && <p className="text-xs text-[var(--text-muted)] mt-1.5">{helper}</p>}
+      {hasDesc
+        ? Children.map(children, child =>
+            isValidElement(child) ? cloneElement(child, { 'aria-describedby': descId }) : child
+          )
+        : children}
+      {error && <p id={descId} className="text-xs text-red-600 mt-1.5" role="alert">{error}</p>}
+      {!error && helper && <p id={descId} className="text-xs text-[var(--text-muted)] mt-1.5">{helper}</p>}
     </div>
   )
 }
@@ -160,8 +167,16 @@ function LetterTemplate() {
   )
 }
 
+const STORAGE_KEY = 'wedding-form-draft'
+
 export default function InvitationForm({ onSubmit, initialData }) {
-  const [form, setForm] = useState(initialData || defaultForm)
+  const [form, setForm] = useState(() => {
+    if (initialData) return initialData
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? { ...defaultForm, ...JSON.parse(saved) } : defaultForm
+    } catch { return defaultForm }
+  })
   const [showTemplate, setShowTemplate] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const templateTriggerRef = useRef(null)
@@ -170,6 +185,14 @@ export default function InvitationForm({ onSubmit, initialData }) {
   useEffect(() => {
     if (initialData) setForm(initialData)
   }, [initialData])
+
+  // Persist form to localStorage (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(form)) } catch {}
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [form])
 
   // Focus trap + Escape for modal
   useEffect(() => {
@@ -363,7 +386,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
             <option value="Ami proche">Ami proche</option>
             <option value="Cousin / Cousine">Cousin / Cousine</option>
             <option value="Oncle / Tante">Oncle / Tante</option>
-<option value="Collègue">Collègue</option>
+            <option value="Collègue">Collègue</option>
             <option value="Autre membre de la famille">Autre membre de la famille</option>
           </select>
         </Field>

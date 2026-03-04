@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, FileText, Check, Loader2, Download, Archive, Paperclip, ExternalLink, Link } from 'lucide-react'
 import { Document, Packer, Paragraph, TextRun } from 'docx'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
+import { notifyHost } from '../emailService'
+import OrnamentalDivider from './OrnamentalDivider'
 
 /* ── Helpers ── */
 
@@ -194,14 +196,6 @@ async function downloadZip(data) {
   saveAs(blob, `dossier_visa_${L.fullName.replace(/\s+/g, '_')}.zip`)
 }
 
-function OrnamentalDivider({ className = '' }) {
-  return (
-    <div className={`ornament text-sm font-display italic tracking-wide ${className}`}>
-      ✿
-    </div>
-  )
-}
-
 function LetterDivider() {
   return (
     <div className="flex items-center gap-3 my-5">
@@ -212,13 +206,13 @@ function LetterDivider() {
 
 function StyledLetterPreview({ data }) {
   const d = data
-  const today = new Date().toISOString().split('T')[0]
+  const today = formatDateFr(new Date())
   const passportLine = d.passportNumber
     ? `, passeport no ${d.passportNumber} (délivré par ${d.issuingCountry || '—'})`
     : ''
   const accomDates =
     d.accommodationDatesStart && d.accommodationDatesEnd
-      ? ` (ou du ${d.accommodationDatesStart} au ${d.accommodationDatesEnd} si différent)`
+      ? ` (ou du ${formatDateFr(d.accommodationDatesStart)} au ${formatDateFr(d.accommodationDatesEnd)} si différent)`
       : ''
 
   return (
@@ -249,7 +243,7 @@ function StyledLetterPreview({ data }) {
       {/* Body paragraphs */}
       <div className="space-y-4 text-sm text-[var(--text)] leading-[1.85]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '15px' }}>
         <p>
-          Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <strong className="text-[var(--text)]">{d.fullName}</strong>, né(e) le {d.dob}, de nationalité {d.nationality}, résidant au {d.address}, téléphone {d.phone}, courriel {d.email}{passportLine}, à venir au Canada pour un séjour temporaire.
+          Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <strong className="text-[var(--text)]">{d.fullName}</strong>, né(e) le {formatDateFr(d.dob)}, de nationalité {d.nationality}, résidant au {d.address}, téléphone {d.phone}, courriel {d.email}{passportLine}, à venir au Canada pour un séjour temporaire.
         </p>
 
         <p className="font-medium text-[var(--accent)]">
@@ -257,7 +251,7 @@ function StyledLetterPreview({ data }) {
         </p>
 
         <p>
-          Dates prévues du séjour : du <strong>{d.arrivalDate}</strong> au <strong>{d.departureDate}</strong> (durée totale : {d.duration}).
+          Dates prévues du séjour : du <strong>{formatDateFr(d.arrivalDate)}</strong> au <strong>{formatDateFr(d.departureDate)}</strong> (durée totale : {d.duration}).
         </p>
         <p>
           Hébergement : {d.fullName} logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur, pendant la durée du séjour{accomDates}.
@@ -268,7 +262,7 @@ function StyledLetterPreview({ data }) {
         </p>
 
         <p>
-          Départ du Canada : {d.fullName} quittera le Canada au plus tard le {d.departureDate} afin de retourner en {d.returnCountry}.
+          Départ du Canada : {d.fullName} quittera le Canada au plus tard le {formatDateFr(d.departureDate)} afin de retourner en {d.returnCountry}.
         </p>
 
         <LetterDivider />
@@ -348,6 +342,15 @@ function DownloadButton({ onClick, icon: Icon, label, className }) {
 }
 
 export default function LetterPreview({ data, onBack }) {
+  const notifiedRef = useRef(false)
+
+  const handleFirstDownload = () => {
+    if (!notifiedRef.current) {
+      notifiedRef.current = true
+      notifyHost(data)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Success banner */}
@@ -389,7 +392,7 @@ export default function LetterPreview({ data, onBack }) {
           Modifier le formulaire
         </motion.button>
         <DownloadButton
-          onClick={() => downloadDocx(data)}
+          onClick={() => { handleFirstDownload(); return downloadDocx(data) }}
           icon={FileText}
           label="Télécharger DOCX"
           className="bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] focus-visible:ring-[var(--accent)]"
@@ -435,7 +438,7 @@ export default function LetterPreview({ data, onBack }) {
           </div>
           <div className="pt-2">
             <DownloadButton
-              onClick={() => downloadZip(data)}
+              onClick={() => { handleFirstDownload(); return downloadZip(data) }}
               icon={Archive}
               label="Tout télécharger (.zip)"
               className="bg-[var(--accent-dark)] text-white hover:bg-[var(--accent-dark-hover)] focus-visible:ring-[var(--accent-dark)] w-full justify-center"

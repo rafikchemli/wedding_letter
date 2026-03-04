@@ -6,7 +6,7 @@ import { Simple } from '@theme-toggles/react'
 import InvitationForm from './components/InvitationForm'
 import LetterPreview from './components/LetterPreview'
 import ParticleSystem from './components/ParticleSystem'
-import { notifyHost } from './emailService'
+import OrnamentalDivider from './components/OrnamentalDivider'
 import './index.css'
 
 const THEMES = {
@@ -32,10 +32,10 @@ const THEMES = {
     heroLight: 'rgba(58,32,16,0.7)',
     heroMuted: 'rgba(58,32,16,0.55)',
     heroGhost: 'rgba(58,32,16,0.4)',
-    nameSandrine: '#C8952A',
-    nameRafik: '#C8952A',
-    ampersand: '#C8952A',
-    ornament: '#C8952A',
+    nameSandrine: '#8B6020',
+    nameRafik: '#8B6020',
+    ampersand: '#8B6020',
+    ornament: '#8B6020',
     ornamentLine: 'rgba(58,32,16,0.5)',
     badgeBg: 'rgba(139,158,126,0.1)',
     stepPast: 'rgba(139,158,126,0.1)',
@@ -78,27 +78,12 @@ const THEMES = {
   },
 }
 
-const base = import.meta.env.BASE_URL
-
-const PHOTOS = {
-  sand: [
-    { src: `${base}photos/sand/sand-sandirne.jpeg`, alt: 'Sandrine au sable' },
-    { src: `${base}photos/sand/desert.jpeg`, alt: 'Sandrine & Rafik dans le désert' },
-    { src: `${base}photos/sand/rafik-sand2.jpeg`, alt: 'Rafik au sable' },
-  ],
-  snow: [
-    { src: `${base}photos/snow/sandrine-neige.jpeg`, alt: 'Sandrine dans la neige' },
-    { src: `${base}photos/snow/snow-both.jpeg`, alt: 'Sandrine & Rafik dans la neige' },
-    { src: `${base}photos/snow/rafik-snow.jpeg`, alt: 'Rafik dans la neige' },
-  ],
-}
-
 function ThemeToggle({ theme, onChange }) {
   const isSnow = theme === 'snow'
   return (
     <div
       className="fixed top-4 right-4 z-50"
-      style={{ opacity: 0, animation: 'fade-in 0.4s ease-out 5s forwards' }}
+      style={{ opacity: 0, animation: 'fade-in 0.4s ease-out 2s forwards' }}
     >
       <Simple
         toggled={isSnow}
@@ -154,14 +139,50 @@ function HeroSvg({ theme }) {
           <stop offset="0%" stopColor={t.sun[0]} stopOpacity={t.sun[1]} />
           <stop offset="100%" stopColor={t.sun[2]} stopOpacity={t.sun[3]} />
         </radialGradient>
+        {/* Dune gradient fills — windward light, leeward shadow */}
+        <linearGradient id="dune-back" x1="0.15" y1="0" x2="0.85" y2="0.4" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#D8B870" />
+          <stop offset="30%" stopColor="#C8A050" />
+          <stop offset="55%" stopColor="#A07830" stopOpacity="0.9" />
+          <stop offset="70%" stopColor="#C8A050" />
+          <stop offset="100%" stopColor="#D8B870" />
+        </linearGradient>
+        <linearGradient id="dune-mid" x1="0.1" y1="0" x2="0.9" y2="0.3" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#DCBC78" />
+          <stop offset="40%" stopColor="#D0AC60" />
+          <stop offset="65%" stopColor="#B89048" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#DCBC78" />
+        </linearGradient>
+        <linearGradient id="dune-front" x1="0" y1="0" x2="1" y2="0.2" gradientUnits="objectBoundingBox">
+          <stop offset="0%" stopColor="#E4C888" />
+          <stop offset="50%" stopColor="#D8BC70" />
+          <stop offset="100%" stopColor="#E4C888" />
+        </linearGradient>
       </defs>
       <rect width="1200" height="800" fill="url(#hero-sky)" />
       <circle cx="600" cy="280" r="180" fill="url(#hero-sun)" />
       {/* Sand ground — static paths, fade out when snow */}
       <motion.g initial={false} animate={{ opacity: isSnow ? 0 : 1 }} transition={fade}>
-        {GROUND_PATHS.sand.map((d, i) => (
-          <path key={i} d={d} fill={THEMES.sand.ground[i].color} fillOpacity={THEMES.sand.ground[i].opacity} />
-        ))}
+        {/* Base dune fills with gradient shading */}
+        <path d={GROUND_PATHS.sand[0]} fill="url(#dune-back)" fillOpacity="0.75" />
+        <path d={GROUND_PATHS.sand[1]} fill="url(#dune-mid)" fillOpacity="0.6" />
+        <path d={GROUND_PATHS.sand[2]} fill="url(#dune-front)" fillOpacity="0.5" />
+
+        {/* Ridge lines — sharp crest edges where wind cuts */}
+        <path d="M200 640 C260 610 310 580 340 565 C400 535 420 530 450 535" fill="none" stroke="#A07828" strokeWidth="1.5" strokeOpacity="0.25" />
+        <path d="M640 615 C720 595 820 555 940 505 C1000 485 1020 482 1050 490" fill="none" stroke="#A07828" strokeWidth="1.5" strokeOpacity="0.2" />
+
+        {/* Mid dune ridge */}
+        <path d="M100 720 C200 700 320 660 480 625 C500 630 520 635 560 645" fill="none" stroke="#B89048" strokeWidth="1" strokeOpacity="0.2" />
+
+        {/* Wind ripple ridges on back dune — subtle parallel contour lines */}
+        <path d="M-50 590 C80 575 200 545 340 505 C420 485 500 500 600 530 C720 520 820 490 960 460 C1040 448 1100 465 1250 505" fill="none" stroke="#C8A858" strokeWidth="0.8" strokeOpacity="0.12" />
+        <path d="M-50 620 C80 605 200 575 340 535 C420 515 500 530 600 558 C720 548 820 518 960 480 C1040 468 1100 490 1250 530" fill="none" stroke="#C8A858" strokeWidth="0.7" strokeOpacity="0.10" />
+        <path d="M-50 650 C100 640 220 610 360 580 C440 565 520 575 640 595 C740 585 840 562 980 535 C1060 525 1140 540 1250 565" fill="none" stroke="#C8A858" strokeWidth="0.6" strokeOpacity="0.08" />
+
+        {/* Wind ripple ridges on mid dune */}
+        <path d="M-50 690 C100 680 250 658 400 638 C480 628 540 635 680 655 C800 645 940 625 1120 618 C1180 622 1220 635 1250 645" fill="none" stroke="#C8A858" strokeWidth="0.6" strokeOpacity="0.10" />
+        <path d="M-50 710 C100 702 260 680 420 660 C500 652 560 658 700 672 C820 665 960 648 1130 642 C1190 646 1230 656 1250 662" fill="none" stroke="#C8A858" strokeWidth="0.5" strokeOpacity="0.08" />
       </motion.g>
       {/* Snow ground — static paths, fade in when snow */}
       <motion.g initial={false} animate={{ opacity: isSnow ? 1 : 0 }} transition={fade}>
@@ -185,14 +206,6 @@ function AnimatedName({ text, delay = 0, className: cls = '', style }) {
     >
       {text}
     </motion.h2>
-  )
-}
-
-function OrnamentalDivider({ className = '' }) {
-  return (
-    <div className={`ornament text-sm font-display italic tracking-wide ${className}`}>
-      ✿
-    </div>
   )
 }
 
@@ -232,7 +245,6 @@ function App() {
     try {
       const saved = localStorage.getItem('wedding-theme') || 'sand'
       document.documentElement.setAttribute('data-theme', saved)
-      document.documentElement.style.backgroundColor = THEMES[saved].bg
       return saved
     } catch { return 'sand' }
   })
@@ -240,7 +252,6 @@ function App() {
   const handleThemeChange = (t) => {
     setTheme(t)
     document.documentElement.setAttribute('data-theme', t)
-    document.documentElement.style.backgroundColor = THEMES[t].bg
     try { localStorage.setItem('wedding-theme', t) } catch {}
   }
 
@@ -248,7 +259,6 @@ function App() {
     setFormData(data)
     setCurrentStep(1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    notifyHost(data)
   }
 
   const handleBack = () => {
@@ -262,6 +272,14 @@ function App() {
 
   const t = THEMES[theme]
 
+  // Garage door — hero slides up as you scroll, revealing content below
+  const heroWrapperRef = useRef(null)
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroWrapperRef,
+    offset: ['start start', 'end start'],
+  })
+  const heroY = useTransform(heroScroll, [0.1, 0.85], ['0%', '-100%'])
+
   return (
     <MotionConfig reducedMotion="user">
     <div
@@ -269,18 +287,22 @@ function App() {
       className="min-h-screen relative overflow-x-hidden transition-colors duration-700"
       style={{ backgroundColor: t.bg }}
     >
-      <ParticleSystem theme={theme} />
       <div className="grain-overlay" aria-hidden="true" />
       <ThemeToggle theme={theme} onChange={handleThemeChange} />
 
-      {/* Hero section with photo background */}
+      {/* Hero — garage door: slides up on scroll to reveal form */}
       {currentStep === 0 && (
-        <section className="relative min-h-dvh flex flex-col items-center overflow-hidden">
+        <div ref={heroWrapperRef} className="relative" style={{ height: '140vh' }}>
+        <motion.section
+          className="sticky top-0 h-dvh flex flex-col items-center overflow-hidden z-20"
+          style={{ y: heroY, boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}
+        >
           {/* Themed background */}
           <div className="absolute inset-0 z-0">
             <HeroSvg theme={theme} />
             <div className="absolute inset-0" style={{ background: t.overlay }} />
             <div className="absolute inset-0" style={{ background: t.tint }} />
+            <ParticleSystem theme={theme} />
           </div>
 
           {/* Top spacer — pushes names to center, shrinks on small screens */}
@@ -342,29 +364,6 @@ function App() {
             </motion.div>
           </motion.div>
 
-          {/* Photos — hidden for now */}
-          {/* <div className="relative z-10 flex gap-2 sm:gap-5 justify-center px-4 mt-6 sm:mt-8">
-            {PHOTOS[theme].map((photo, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: i === 1 ? 5.0 : 4.2, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
-                className="relative w-[28%] max-w-[220px] aspect-[3/4] rounded-xl overflow-hidden shadow-lg"
-                style={{ rotate: i === 0 ? '-3deg' : i === 2 ? '3deg' : '0deg' }}
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              </motion.div>
-            ))}
-          </div> */}
-
           {/* Bottom spacer — pushes CTA toward bottom */}
           <div className="flex-1" />
 
@@ -403,12 +402,17 @@ function App() {
               </motion.div>
             </motion.div>
           </motion.div>
-        </section>
+        </motion.section>
+        </div>
       )}
 
 
-      {/* Main */}
-      <main id="form-section" className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10">
+      {/* Main — pulled up behind the hero so it's revealed as the door opens */}
+      <main
+        id="form-section"
+        className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10"
+        style={currentStep === 0 ? { marginTop: '-40vh', backgroundColor: t.bg } : undefined}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}

@@ -2,6 +2,7 @@
 
 /* ─── Theme tokens ─── */
 :root, [data-theme="sand"] {
+  --bg: #FDF5ED;
   --surface: #FFFBF7;
   --surface-alt: #FDF8F4;
   --text: #3B4A30;
@@ -15,18 +16,19 @@
   --text-70: rgba(59, 74, 48, 0.7);
   --text-muted-60: rgba(122, 107, 85, 0.6);
   --text-muted-70: rgba(122, 107, 85, 0.7);
-  --accent: #B8864A;
-  --accent-hover: #A47640;
-  --accent-5: rgba(184, 134, 74, 0.05);
-  --accent-10: rgba(184, 134, 74, 0.1);
-  --accent-15: rgba(184, 134, 74, 0.15);
-  --accent-20: rgba(184, 134, 74, 0.2);
-  --accent-30: rgba(184, 134, 74, 0.3);
+  --accent: #956830;
+  --accent-hover: #845828;
+  --accent-5: rgba(149, 104, 48, 0.05);
+  --accent-10: rgba(149, 104, 48, 0.1);
+  --accent-15: rgba(149, 104, 48, 0.15);
+  --accent-20: rgba(149, 104, 48, 0.2);
+  --accent-30: rgba(149, 104, 48, 0.3);
   --accent-dark: #6A4A20;
   --accent-dark-hover: #5A3A18;
 }
 
 [data-theme="snow"] {
+  --bg: #111820;
   --surface: #1A2430;
   --surface-alt: #151D28;
   --text: #D8E4F0;
@@ -40,13 +42,13 @@
   --text-70: rgba(216, 228, 240, 0.7);
   --text-muted-60: rgba(104, 128, 160, 0.6);
   --text-muted-70: rgba(104, 128, 160, 0.7);
-  --accent: #5B8FAF;
-  --accent-hover: #4B7F9F;
-  --accent-5: rgba(91, 143, 175, 0.05);
-  --accent-10: rgba(91, 143, 175, 0.1);
-  --accent-15: rgba(91, 143, 175, 0.15);
-  --accent-20: rgba(91, 143, 175, 0.2);
-  --accent-30: rgba(91, 143, 175, 0.3);
+  --accent: #3D7A9A;
+  --accent-hover: #2D6A8A;
+  --accent-5: rgba(61, 122, 154, 0.05);
+  --accent-10: rgba(61, 122, 154, 0.1);
+  --accent-15: rgba(61, 122, 154, 0.15);
+  --accent-20: rgba(61, 122, 154, 0.2);
+  --accent-30: rgba(61, 122, 154, 0.3);
   --accent-dark: #1A3454;
   --accent-dark-hover: #14283F;
 }
@@ -54,20 +56,15 @@
 /* ─── Fonts ─── */
 html {
   scroll-behavior: smooth;
-  background-color: #FDF5ED;
+  background-color: var(--bg);
 }
 
 body {
   font-family: 'Lato', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FDF5ED;
+  background-color: var(--bg);
   transition: background-color 0.7s;
-}
-
-[data-theme="snow"] body,
-[data-theme="snow"] {
-  background-color: #111820;
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {
@@ -175,6 +172,16 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 
 /* Snow overrides for ornament/border now handled by CSS variables above */
+
+/* ─── Select dropdown caret — theme-aware ─── */
+select[style*="backgroundImage"] {
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+[data-theme="snow"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23D8E4F0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+}
 
 /* ─── Reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {

@@ -133,11 +133,11 @@ function createStreak(w, h, scattered) {
     y: y + travelY,
     spawnY: y,
     length: 5 + Math.random() * 12,
-    thickness: 0.3 + Math.random() * 0.6,
+    thickness: 0.5 + Math.random() * 0.8,
     color: pickColor(SAND.colors),
-    opacity: 0.25 + Math.random() * 0.35,
-    windSpeed: 2.5 + Math.random() * 3.0,
-    drift: -(0.3 + Math.random() * 0.8), // blow upward off crest
+    opacity: 0.45 + Math.random() * 0.4,
+    windSpeed: 1.0 + Math.random() * 1.5,
+    drift: -(0.15 + Math.random() * 0.4), // blow upward off crest
     wobbleAmp: 0.15 + Math.random() * 0.3,
     wobbleFreq: 1.5 + Math.random() * 2,
     phase: Math.random() * Math.PI * 2,
@@ -156,13 +156,13 @@ function createGrain(w, h, scattered) {
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    size: 0.5 + Math.random() * 1.5,
+    size: 0.8 + Math.random() * 2.0,
     color: pickColor(SAND.colors),
-    opacity: 0.2 + Math.random() * 0.45,
-    windSpeed: 1.0 + Math.random() * 2.0,
-    lift: -(0.4 + Math.random() * 1.0),  // initial upward velocity
-    fall: 0.015 + Math.random() * 0.03,   // gravity pulls back
-    vy: scattered ? (Math.random() - 0.5) * 0.5 : -(0.4 + Math.random() * 1.0),
+    opacity: 0.4 + Math.random() * 0.45,
+    windSpeed: 0.4 + Math.random() * 0.8,
+    lift: -(0.2 + Math.random() * 0.5),  // initial upward velocity
+    fall: 0.008 + Math.random() * 0.015,   // gravity pulls back
+    vy: scattered ? (Math.random() - 0.5) * 0.25 : -(0.2 + Math.random() * 0.5),
     wobbleAmp: 0.3 + Math.random() * 0.6,
     wobbleFreq: 2 + Math.random() * 3,
     phase: Math.random() * Math.PI * 2,
@@ -181,11 +181,11 @@ function createDustMote(w, h, scattered) {
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    size: 0.8 + Math.random() * 1.5,
+    size: 1.0 + Math.random() * 2.0,
     color: pickColor(SAND.dustColors),
-    opacity: 0.06 + Math.random() * 0.14,
-    windSpeed: 0.15 + Math.random() * 0.4,
-    lift: -(0.1 + Math.random() * 0.3),
+    opacity: 0.12 + Math.random() * 0.22,
+    windSpeed: 0.06 + Math.random() * 0.15,
+    lift: -(0.05 + Math.random() * 0.15),
     wobbleAmp: 0.5 + Math.random() * 1.0,
     wobbleFreq: 0.5 + Math.random() * 1.0,
     phase: Math.random() * Math.PI * 2,
@@ -352,8 +352,8 @@ function createStreamParticle(w, h, scattered) {
     size: 0.3 + Math.random() * 0.9,
     length: 3 + Math.random() * 8,
     color: pickColor(SAND.colors),
-    opacity: 0.08 + Math.random() * 0.22,
-    speed: 3.0 + Math.random() * 4.0,
+    opacity: 0.18 + Math.random() * 0.3,
+    speed: 1.2 + Math.random() * 1.5,
     phase: Math.random() * Math.PI * 2,
     wobbleFreq: 1 + Math.random() * 2,
     wobbleAmp: 0.2 + Math.random() * 0.5,
@@ -465,28 +465,47 @@ export default function ParticleSystem({ theme = 'sand' }) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
     let running = true
     let raf = null
-    let time = 0
+    let lastTime = performance.now()
 
-    const isMobile = window.innerWidth < 640
+    let isMobile = window.innerWidth < 640
+    let w = window.innerWidth
+    let h = window.innerHeight
 
     const resize = () => {
       canvas.width = window.innerWidth * dpr
       canvas.height = window.innerHeight * dpr
       canvas.style.width = `${window.innerWidth}px`
       canvas.style.height = `${window.innerHeight}px`
+
+      const newW = window.innerWidth
+      const newH = window.innerHeight
+      const newMobile = newW < 640
+
+      if (Math.abs(newW - w) > 100 || Math.abs(newH - h) > 100 || newMobile !== isMobile) {
+        w = newW
+        h = newH
+        isMobile = newMobile
+        rebuildParticles()
+      } else {
+        w = newW
+        h = newH
+      }
     }
     resize()
 
-    const w = window.innerWidth
-    const h = window.innerHeight
-
     // Create particles based on theme
-    const items = theme === 'snow'
+    let items = theme === 'snow'
       ? Array.from({ length: isMobile ? SNOW.mobileCount : SNOW.count }, () => createSnowflake(w, h, true))
       : createSandParticles(w, h, isMobile)
 
-    // Ground streams (only for sand theme)
-    const streams = theme === 'sand' ? createStreamParticles(w, h, isMobile) : null
+    let streams = theme === 'sand' ? createStreamParticles(w, h, isMobile) : null
+
+    function rebuildParticles() {
+      items = theme === 'snow'
+        ? Array.from({ length: isMobile ? SNOW.mobileCount : SNOW.count }, () => createSnowflake(w, h, true))
+        : createSandParticles(w, h, isMobile)
+      streams = theme === 'sand' ? createStreamParticles(w, h, isMobile) : null
+    }
 
     // Cursor trail
     const trail = []
@@ -509,15 +528,16 @@ export default function ParticleSystem({ theme = 'sand' }) {
       window.addEventListener('mousemove', onMouseMove)
     }
 
-    const animate = () => {
+    let time = 0
+
+    const animate = (now) => {
       if (!running) return
-      const w = window.innerWidth
-      const h = window.innerHeight
+      const dt = Math.min((now - lastTime) / 1000, 0.05)
+      lastTime = now
+      time += dt
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, w, h)
-
-      time += 0.016
 
       if (theme === 'snow') {
         animateSnow(ctx, items, w, h, time)
