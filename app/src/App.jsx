@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Heart, FileText, ChevronRight, ChevronDown } from 'lucide-react'
 import InvitationForm from './components/InvitationForm'
 import LetterPreview from './components/LetterPreview'
@@ -31,9 +31,9 @@ function FloatingPetals() {
 
 const calligraphyContainer = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.25, delayChildren: 0.1 },
-  },
+  visible: (delay) => ({
+    transition: { staggerChildren: 0.25, delayChildren: delay },
+  }),
 }
 
 const calligraphyChild = {
@@ -52,9 +52,9 @@ function AnimatedName({ text, delay = 0, className: cls = '' }) {
   return (
     <motion.h2
       variants={calligraphyContainer}
+      custom={delay}
       initial="hidden"
       animate="visible"
-      transition={{ delayChildren: delay }}
       className={`font-calligraphy ${cls}`}
       aria-label={text}
     >
@@ -123,6 +123,32 @@ function PhotoGallery() {
 
       <OrnamentalDivider className="max-w-xs mx-auto mt-10" />
     </motion.section>
+  )
+}
+
+function ScrollGoldFoil({ children, delay }) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
+  const backgroundPosition = useTransform(scrollYProgress, [0, 1], ['-200% center', '200% center'])
+
+  return (
+    <motion.p
+      ref={ref}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8, delay }}
+      className="text-lg font-display font-semibold tracking-wide drop-shadow-sm"
+      style={{
+        background: 'linear-gradient(105deg, #C49A2E 0%, #D4AF37 20%, #F5E6A3 40%, #FFFAD4 50%, #F5E6A3 60%, #D4AF37 80%, #C49A2E 100%)',
+        backgroundSize: '250% auto',
+        backgroundPosition,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}
+    >
+      {children}
+    </motion.p>
   )
 }
 
@@ -272,9 +298,9 @@ function App() {
               transition={{ duration: 0.8, delay: 5.0 }}
               className="mt-8 space-y-2"
             >
-              <p className="gold-foil text-lg text-[#5C6B4F] font-display font-semibold tracking-wide drop-shadow-sm">
+              <ScrollGoldFoil delay={5.0}>
                 19 septembre 2026
-              </p>
+              </ScrollGoldFoil>
               <p className="text-sm text-[#5C6B4F]/70 drop-shadow-sm">
                 Studio L'Éloi — Montréal, Québec
               </p>
