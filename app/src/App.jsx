@@ -10,10 +10,12 @@ const steps = [
   { id: 'preview', label: 'Aperçu' },
 ]
 
+const base = import.meta.env.BASE_URL
+
 const photos = [
-  { src: '/photos/beach.svg', alt: 'Rafik & Sandrine au coucher de soleil' },
-  { src: '/photos/dunes.svg', alt: 'Rafik & Sandrine sur les dunes' },
-  { src: '/photos/hero.svg', alt: 'Rafik & Sandrine dans le désert' },
+  { src: `${base}photos/beach.svg`, alt: 'Rafik & Sandrine au coucher de soleil' },
+  { src: `${base}photos/dunes.svg`, alt: 'Rafik & Sandrine sur les dunes' },
+  { src: `${base}photos/hero.svg`, alt: 'Rafik & Sandrine dans le désert' },
 ]
 
 function FloatingPetals() {
@@ -216,7 +218,7 @@ function App() {
           {/* Background photo */}
           <div className="absolute inset-0 z-0">
             <img
-              src="/photos/hero.svg"
+              src={`${base}photos/hero.svg`}
               alt=""
               className="w-full h-full object-cover"
             />
