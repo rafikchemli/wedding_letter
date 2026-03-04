@@ -80,11 +80,18 @@ const THEMES = {
 
 const base = import.meta.env.BASE_URL
 
-const photos = [
-  { src: `${base}photos/chevre.jpeg`, alt: 'Sandrine & Rafik à Chèvre' },
-  { src: `${base}photos/desert.jpeg`, alt: 'Sandrine & Rafik dans le désert' },
-  { src: `${base}photos/kawa.jpeg`, alt: 'Sandrine & Rafik au café' },
-]
+const PHOTOS = {
+  sand: [
+    { src: `${base}photos/sand/sand-sandirne.jpeg`, alt: 'Sandrine au sable' },
+    { src: `${base}photos/sand/desert.jpeg`, alt: 'Sandrine & Rafik dans le désert' },
+    { src: `${base}photos/sand/rafik-sand2.jpeg`, alt: 'Rafik au sable' },
+  ],
+  snow: [
+    { src: `${base}photos/snow/sandrine-neige.jpeg`, alt: 'Sandrine dans la neige' },
+    { src: `${base}photos/snow/snow-both.jpeg`, alt: 'Sandrine & Rafik dans la neige' },
+    { src: `${base}photos/snow/rafik-snow.jpeg`, alt: 'Rafik dans la neige' },
+  ],
+}
 
 function ThemeToggle({ theme, onChange }) {
   const isSnow = theme === 'snow'
@@ -263,6 +270,7 @@ function App() {
       style={{ backgroundColor: t.bg }}
     >
       <ParticleSystem theme={theme} />
+      <div className="grain-overlay" aria-hidden="true" />
       <ThemeToggle theme={theme} onChange={handleThemeChange} />
 
       {/* Hero section with photo background */}
@@ -334,9 +342,9 @@ function App() {
             </motion.div>
           </motion.div>
 
-          {/* Photos — 1 & 3 appear first, then 2 */}
-          <div className="relative z-10 flex gap-2 sm:gap-5 justify-center px-4 mt-6 sm:mt-8">
-            {photos.map((photo, i) => (
+          {/* Photos — hidden for now */}
+          {/* <div className="relative z-10 flex gap-2 sm:gap-5 justify-center px-4 mt-6 sm:mt-8">
+            {PHOTOS[theme].map((photo, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -355,7 +363,7 @@ function App() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </motion.div>
             ))}
-          </div>
+          </div> */}
 
           {/* Bottom spacer — pushes CTA toward bottom */}
           <div className="flex-1" />
