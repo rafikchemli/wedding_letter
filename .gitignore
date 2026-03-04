@@ -7,3 +7,10 @@
 # Environment
 .env
 .env.local
+
+# Claude skill files
+.claude/skills/ui-design-brain/components.md
+.claude/skills/ui-design-brain/SKILL.md
+
+# Misc audit screenshots
+misc/
