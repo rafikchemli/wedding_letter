@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, FileText, Check, Loader2, Download, Archive, Paperclip } from 'lucide-react'
+import { ArrowLeft, FileText, Check, Loader2, Download, Archive, Paperclip, ExternalLink, Link } from 'lucide-react'
 import { Document, Packer, Paragraph, TextRun } from 'docx'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
@@ -440,6 +440,63 @@ export default function LetterPreview({ data, onBack }) {
               label="Tout télécharger (.zip)"
               className="bg-[#3B4A30] text-white hover:bg-[#2E3B25] focus-visible:ring-[#3B4A30] w-full justify-center"
             />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Useful links for visa application */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="bg-[#FFFBF7] rounded-2xl border border-[#E8C4B8]/30 shadow-sm overflow-hidden"
+      >
+        <div className="bg-[#FDF8F4] border-b border-[#E8C4B8]/30 px-6 py-3.5 flex items-center gap-2">
+          <Link className="w-4 h-4 text-[#7A6B55]" />
+          <span className="text-xs font-medium text-[#7A6B55] uppercase tracking-wider">
+            Liens utiles
+          </span>
+        </div>
+        <div className="p-5 space-y-3">
+          <p className="text-sm text-[#7A6B55] text-pretty">
+            Ressources pour votre demande de visa visiteur au Canada.
+          </p>
+          <div className="space-y-2">
+            <a
+              href="https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/apply-visitor-visa.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[#E8C4B8]/20
+                hover:bg-[#8B9E7E]/5 transition-colors duration-200 group"
+            >
+              <ExternalLink className="w-4 h-4 text-[#8B9E7E] shrink-0 mt-0.5" />
+              <div>
+                <span className="text-sm font-medium text-[#3B4A30] group-hover:text-[#8B9E7E] transition-colors duration-200 block">
+                  Demande de visa visiteur — IRCC
+                </span>
+                <span className="text-xs text-[#7A6B55]/70">
+                  Guide officiel pour faire une demande de visa de visiteur au Canada
+                </span>
+              </div>
+            </a>
+            <a
+              href="https://www.vfsglobal.ca/canada/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[#E8C4B8]/20
+                hover:bg-[#8B9E7E]/5 transition-colors duration-200 group"
+            >
+              <ExternalLink className="w-4 h-4 text-[#8B9E7E] shrink-0 mt-0.5" />
+              <div>
+                <span className="text-sm font-medium text-[#3B4A30] group-hover:text-[#8B9E7E] transition-colors duration-200 block">
+                  VFS Global Canada
+                </span>
+                <span className="text-xs text-[#7A6B55]/70">
+                  Centre de réception des demandes de visa (prise de rendez-vous)
+                </span>
+              </div>
+            </a>
           </div>
         </div>
       </motion.div>

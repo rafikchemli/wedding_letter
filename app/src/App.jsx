@@ -255,27 +255,32 @@ function App() {
             transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
             className="relative z-10 text-center px-4"
           >
-            <p className="text-sm uppercase tracking-[0.3em] text-[#4A3628]/70 mb-6 drop-shadow-sm">
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="text-sm uppercase tracking-[0.3em] text-[#4A3628]/70 mb-6 drop-shadow-sm"
+            >
               Vous êtes invité(e) au mariage de
-            </p>
+            </motion.p>
 
             <div>
               <AnimatedName
                 text="Sandrine"
-                delay={0.3}
+                delay={1.5}
                 className="text-5xl sm:text-7xl text-[#4A3628] leading-[1.1] mb-2 drop-shadow-sm"
               />
               <motion.div
                 initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 1.1, ease: 'easeOut' }}
+                transition={{ duration: 0.6, delay: 2.3, ease: 'easeOut' }}
                 className="ornament text-2xl my-3 text-[#8B6A40] font-display italic"
               >
                 &
               </motion.div>
               <AnimatedName
                 text="Rafik"
-                delay={1.5}
+                delay={2.7}
                 className="text-5xl sm:text-7xl text-[#4A3628] leading-[1.1] drop-shadow-sm"
               />
             </div>
@@ -283,10 +288,10 @@ function App() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 2.6 }}
+              transition={{ duration: 0.8, delay: 3.8 }}
               className="mt-8 space-y-2"
             >
-              <ScrollGoldFoil delay={2.6}>
+              <ScrollGoldFoil delay={3.8}>
                 19 septembre 2026
               </ScrollGoldFoil>
               <p className="text-sm text-[#4A3628]/60 drop-shadow-sm">
@@ -297,7 +302,7 @@ function App() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 3.2 }}
+              transition={{ duration: 0.6, delay: 4.4 }}
               className="mt-12"
             >
               <OrnamentalDivider className="mb-8 max-w-xs mx-auto" />
@@ -325,7 +330,7 @@ function App() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 4.0, duration: 0.6 }}
+              transition={{ delay: 5.2, duration: 0.6 }}
               className="mt-16"
             >
               <motion.div
