@@ -10,6 +10,12 @@ const steps = [
   { id: 'preview', label: 'Aperçu' },
 ]
 
+const photos = [
+  { src: '/photos/beach.jpg', alt: 'Rafik & Sandrine au coucher de soleil' },
+  { src: '/photos/dunes.jpg', alt: 'Rafik & Sandrine sur les dunes' },
+  { src: '/photos/hero.jpg', alt: 'Rafik & Sandrine dans le désert' },
+]
+
 function FloatingPetals() {
   return (
     <>
@@ -25,6 +31,49 @@ function OrnamentalDivider({ className = '' }) {
     <div className={`ornament text-sm font-display italic tracking-wide ${className}`}>
       ✿
     </div>
+  )
+}
+
+function PhotoGallery() {
+  return (
+    <motion.section
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="py-12 sm:py-16 relative z-10"
+    >
+      <OrnamentalDivider className="max-w-xs mx-auto mb-10" />
+
+      <div className="flex gap-4 sm:gap-6 justify-center px-4 max-w-4xl mx-auto">
+        {photos.map((photo, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20, rotate: i === 0 ? -3 : i === 2 ? 3 : 0 }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              rotate: i === 0 ? -3 : i === 2 ? 3 : 0,
+            }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.5, delay: i * 0.15, ease: 'easeOut' }}
+            whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
+            className="relative flex-1 max-w-[200px] sm:max-w-[240px] aspect-[3/4] rounded-2xl overflow-hidden
+              shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
+          >
+            <img
+              src={photo.src}
+              alt={photo.alt}
+              className="w-full h-full object-cover"
+            />
+            {/* Soft overlay at bottom */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          </motion.div>
+        ))}
+      </div>
+
+      <OrnamentalDivider className="max-w-xs mx-auto mt-10" />
+    </motion.section>
   )
 }
 
@@ -120,30 +169,29 @@ function App() {
         </div>
       </motion.header>
 
-      {/* Hero section — only visible on form step before scrolling down */}
+      {/* Hero section with photo background */}
       {currentStep === 0 && !showForm && (
-        <section className="relative flex flex-col items-center justify-center min-h-[85vh] px-4 text-center">
-          {/* Decorative circles */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.15, scale: 1 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
-            className="absolute w-[500px] h-[500px] rounded-full border border-[#8B9E7E]/30 pointer-events-none"
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.1, scale: 1 }}
-            transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
-            className="absolute w-[650px] h-[650px] rounded-full border border-[#E8C4B8]/30 pointer-events-none"
-          />
+        <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden">
+          {/* Background photo */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/photos/hero.jpg"
+              alt=""
+              className="w-full h-full object-cover"
+            />
+            {/* Overlays for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#FDF8F4]/70 via-[#FDF8F4]/50 to-[#FDF8F4]/90" />
+            <div className="absolute inset-0 bg-[#5C6B4F]/10" />
+          </div>
 
+          {/* Content */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-            className="relative z-10"
+            className="relative z-10 text-center px-4"
           >
-            <p className="text-sm uppercase tracking-[0.3em] text-[#C4A98A] mb-6">
+            <p className="text-sm uppercase tracking-[0.3em] text-[#5C6B4F]/80 mb-6 drop-shadow-sm">
               Vous êtes invité(e) au mariage de
             </p>
 
@@ -152,13 +200,13 @@ function App() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
             >
-              <h2 className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] mb-2">
+              <h2 className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] mb-2 drop-shadow-sm">
                 Rafik
               </h2>
-              <div className="ornament text-2xl my-3 text-[#C4A98A] font-display italic">
+              <div className="ornament text-2xl my-3 text-[#8B9E7E] font-display italic">
                 &
               </div>
-              <h2 className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1]">
+              <h2 className="font-display text-5xl sm:text-7xl font-semibold text-[#5C6B4F] leading-[1.1] drop-shadow-sm">
                 Sandrine
               </h2>
             </motion.div>
@@ -169,10 +217,10 @@ function App() {
               transition={{ duration: 0.6, delay: 0.8 }}
               className="mt-8 space-y-2"
             >
-              <p className="text-base text-[#8B9E7E] font-medium tracking-wide">
+              <p className="text-base text-[#5C6B4F] font-medium tracking-wide drop-shadow-sm">
                 19 septembre 2026
               </p>
-              <p className="text-sm text-[#C4A98A]">
+              <p className="text-sm text-[#5C6B4F]/70 drop-shadow-sm">
                 Studio L'Éloi — Montréal, Québec
               </p>
             </motion.div>
@@ -185,7 +233,7 @@ function App() {
             >
               <OrnamentalDivider className="mb-8 max-w-xs mx-auto" />
 
-              <p className="text-sm text-[#8B9E7E]/70 max-w-md mx-auto leading-relaxed mb-8">
+              <p className="text-sm text-[#5C6B4F]/60 max-w-md mx-auto leading-relaxed mb-8 drop-shadow-sm">
                 Générez votre lettre d'invitation officielle IRCC
                 pour votre demande de visa visiteur au Canada.
               </p>
@@ -195,7 +243,7 @@ function App() {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 className="animated-border bg-[#8B9E7E] text-white rounded-full px-8 py-3.5 text-sm font-medium
-                  hover:bg-[#7A8E6D] shadow-md hover:shadow-lg
+                  hover:bg-[#7A8E6D] shadow-lg hover:shadow-xl
                   focus-visible:ring-2 focus-visible:ring-[#8B9E7E] focus-visible:ring-offset-2
                   transition-all duration-300 inline-flex items-center gap-2 cursor-pointer"
               >
@@ -215,11 +263,16 @@ function App() {
                 animate={{ y: [0, 8, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <ChevronDown className="w-5 h-5 text-[#C4A98A] mx-auto" />
+                <ChevronDown className="w-5 h-5 text-[#5C6B4F]/50 mx-auto" />
               </motion.div>
             </motion.div>
           </motion.div>
         </section>
+      )}
+
+      {/* Photo gallery — visible on form step */}
+      {currentStep === 0 && (
+        <PhotoGallery />
       )}
 
       {/* Main */}
