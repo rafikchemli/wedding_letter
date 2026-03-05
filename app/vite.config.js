@@ -9,7 +9,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // Dev-only plugin: exposes /api/generate-docx that calls python-docx
 function pythonDocxPlugin() {
-  const venvPython = resolve(__dirname, '.venv/bin/python3')
   const script = resolve(__dirname, 'scripts/generate_letter.py')
 
   return {
@@ -26,7 +25,7 @@ function pythonDocxPlugin() {
         req.on('end', () => {
           try {
             const { data, lang } = JSON.parse(body)
-            const child = spawn(venvPython, [script, lang || 'fr'])
+            const child = spawn('uv', ['run', 'python', script, lang || 'fr'])
             const chunks = []
 
             child.stdin.write(JSON.stringify(data))

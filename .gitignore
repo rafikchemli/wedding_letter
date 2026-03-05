@@ -8,6 +8,10 @@
 .env
 .env.local
 
+# Python
+__pycache__/
+*.pyc
+
 # Claude skill files
 .claude/skills/ui-design-brain/components.md
 .claude/skills/ui-design-brain/SKILL.md
@@ -18,5 +22,6 @@ misc/
 # Loose screenshots in repo root
 /*.png
 /*.jpg
-app/public/audio/Journey Soundtrack (Austin Wintory) - 01. Nascence.mp3
-app/public/audio/TES V Skyrim Soundtrack - Secunda 0.mp3
+
+# Large audio files
+app/public/audio/*.mp3
