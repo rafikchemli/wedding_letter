@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, FileText, Check, Loader2, Download, Archive, Paperclip, ExternalLink, Link } from 'lucide-react'
-import { Document, Packer, Paragraph, TextRun } from 'docx'
+import { Document, Packer, Paragraph, TextRun, AlignmentType, UnderlineType } from 'docx'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { notifyHost } from '../emailService'
@@ -50,7 +50,7 @@ function p(runs, opts = {}) {
   return new Paragraph({
     children: Array.isArray(runs) ? runs : [runs],
     spacing: { after, before, line: LINE },
-    ...(justify ? { alignment: 'both' } : {}),
+    ...(justify ? { alignment: AlignmentType.BOTH } : {}),
     ...(indent ? { indent: { left: indent } } : {}),
     ...rest,
   })
@@ -145,7 +145,7 @@ async function generateDocxBlob(d) {
     p([t('Citoyen canadien')], { after: 480 }),
 
     // Enclosures
-    p([bold('p.j. (pièces jointes) :', { underline: { type: 'single' } })], { after: 40 }),
+    p([bold('p.j. (pièces jointes) :', { underline: { type: UnderlineType.SINGLE } })], { after: 40 }),
     p([t('– Copie de la carte de citoyenneté canadienne')], { after: 20, indent: 360 }),
     p([t('– Lettre d\'emploi (NewMathData)')], { after: 20, indent: 360 }),
     p([t('– Facture d\'électricité (confirmation de domicile)')], { after: 20, indent: 360 }),
@@ -255,7 +255,7 @@ function generateDocxBlobEn(d) {
     p([t('Canadian Citizen')], { after: 480 }),
 
     // Enclosures
-    p([bold('Encl. (enclosed documents):', { underline: { type: 'single' } })], { after: 40 }),
+    p([bold('Encl. (enclosed documents):', { underline: { type: UnderlineType.SINGLE } })], { after: 40 }),
     p([t('– Copy of Canadian citizenship card')], { after: 20, indent: 360 }),
     p([t('– Employment letter (NewMathData)')], { after: 20, indent: 360 }),
     p([t('– Electricity bill (proof of residence)')], { after: 20, indent: 360 }),
