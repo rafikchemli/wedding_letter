@@ -71,7 +71,7 @@ async function generateDocxBlob(d) {
     // Sender header
     p([bold('MADJDI RAFIK CHEMLI', { size: SZ_NAME })], { after: 0 }),
     p([t('308-267 Rachel Est')], { after: 0 }),
-    p([t('Montréal (QC), Canada H2W 1E5')], { after: 0 }),
+    p([t('Montréal (QC), Canada, H2W 1E5')], { after: 0 }),
     p([t('Tél. : 514-793-1185')], { after: 0 }),
     p([t('Courriel : rafik.madjdi.chemli@gmail.com')], { after: 200 }),
     p([t(`Date : ${L.today}`)], { after: 480 }),
@@ -182,7 +182,7 @@ function generateDocxBlobEn(d) {
     // Sender header
     p([bold('MADJDI RAFIK CHEMLI', { size: SZ_NAME })], { after: 0 }),
     p([t('308-267 Rachel Est')], { after: 0 }),
-    p([t('Montréal (QC), Canada H2W 1E5')], { after: 0 }),
+    p([t('Montréal (QC), Canada, H2W 1E5')], { after: 0 }),
     p([t('Phone: 514-793-1185')], { after: 0 }),
     p([t('Email: rafik.madjdi.chemli@gmail.com')], { after: 200 }),
     p([t(`Date: ${L.todayEn}`)], { after: 480 }),
@@ -353,7 +353,7 @@ function StyledLetterPreview({ data }) {
         <h3 className="font-calligraphy text-3xl text-[var(--text)] mb-2">Madjdi Rafik Chemli</h3>
         <div className="text-xs text-[var(--text-muted)] tracking-wider uppercase space-y-0.5">
           <p>308-267 Rachel Est</p>
-          <p>Montréal (QC), Canada H2W 1E5</p>
+          <p>Montréal (QC), Canada, H2W 1E5</p>
           <p>Tél. : 514-793-1185</p>
           <p>Courriel : rafik.madjdi.chemli@gmail.com</p>
           <p className="mt-2">{today}</p>
