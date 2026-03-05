@@ -4,6 +4,8 @@ import { ArrowLeft, FileText, Check, Loader2, Download, Archive, Paperclip, Exte
 import { Document, Packer, Paragraph, TextRun, AlignmentType, UnderlineType } from 'docx'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
+import PizZip from 'pizzip'
+import Docxtemplater from 'docxtemplater'
 import { notifyHost } from '../emailService'
 import OrnamentalDivider from './OrnamentalDivider'
 
@@ -291,6 +293,54 @@ async function downloadDocx(d, lang = 'fr') {
   saveAs(blob, `invitation_${L.fullName.replace(/\s+/g, '_')}_${lang.toUpperCase()}.docx`)
 }
 
+/* ── Docxtemplater engine ── */
+
+async function downloadDocxTemplate(d, lang = 'fr') {
+  const L = letterData(d)
+  const templateUrl = `${import.meta.env.BASE_URL}templates/lettre_template_${lang}.docx`
+  const res = await fetch(templateUrl)
+  if (!res.ok) throw new Error(`Template not found: ${templateUrl}`)
+  const buf = await res.arrayBuffer()
+
+  const zip = new PizZip(buf)
+  const doc = new Docxtemplater(zip, {
+    paragraphLoop: true,
+    linebreaks: true,
+    delimiters: { start: '{', end: '}' },
+  })
+
+  const data = {
+    fullName: L.fullName,
+    address: L.address,
+    duration: L.duration,
+    returnCountry: L.returnCountry,
+    returnReason: L.returnReason,
+    passportNumber: L.passportNumber || '',
+    issuingCountry: L.issuingCountry || '',
+  }
+
+  if (lang === 'fr') {
+    data.dateFr = `Date : ${L.today}`
+    data.dobFr = formatDateFr(L.dob)
+    data.arrivalDateFr = formatDateFr(L.arrivalDate)
+    data.departureDateFr = formatDateFr(L.departureDate)
+    data.relationshipFr = L.relationshipFr
+    data.passportLineFr = L.passportLine
+  } else {
+    data.dateEn = `Date: ${L.todayEn}`
+    data.dobEn = formatDateEn(L.dob)
+    data.arrivalDateEn = formatDateEn(L.arrivalDate)
+    data.departureDateEn = formatDateEn(L.departureDate)
+    data.relationshipEn = L.relationshipEn
+    data.passportLineEn = L.passportLineEn
+  }
+
+  doc.render(data)
+
+  const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+  saveAs(out, `invitation_${L.fullName.replace(/\s+/g, '_')}_${lang.toUpperCase()}_template.docx`)
+}
+
 /* ── Supporting documents ── */
 
 const base = import.meta.env.BASE_URL
@@ -466,6 +516,7 @@ function DownloadButton({ onClick, icon: Icon, label, className }) {
 
 export default function LetterPreview({ data, onBack }) {
   const notifiedRef = useRef(false)
+  const [engine, setEngine] = useState('docx') // 'docx' | 'template'
 
   const handleFirstDownload = () => {
     if (!notifiedRef.current) {
@@ -514,21 +565,40 @@ export default function LetterPreview({ data, onBack }) {
           <ArrowLeft className="w-4 h-4" />
           Modifier le formulaire
         </motion.button>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <DownloadButton
-            onClick={() => { handleFirstDownload(); return downloadDocx(data, 'fr') }}
+            onClick={() => { handleFirstDownload(); return (engine === 'template' ? downloadDocxTemplate : downloadDocx)(data, 'fr') }}
             icon={FileText}
             label="DOCX Français"
             className="bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] focus-visible:ring-[var(--accent)]"
           />
           <DownloadButton
-            onClick={() => { handleFirstDownload(); return downloadDocx(data, 'en') }}
+            onClick={() => { handleFirstDownload(); return (engine === 'template' ? downloadDocxTemplate : downloadDocx)(data, 'en') }}
             icon={FileText}
             label="DOCX English"
             className="bg-[var(--accent-dark)] text-white hover:bg-[var(--accent-dark-hover)] focus-visible:ring-[var(--accent-dark)]"
           />
         </div>
       </motion.div>
+
+      {/* Dev toggle — engine selector */}
+      {import.meta.env.DEV && (
+        <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-[var(--surface-alt)] border border-[var(--border-20)] text-xs text-[var(--text-muted)]">
+          <span className="font-medium">Engine :</span>
+          <button
+            onClick={() => setEngine('docx')}
+            className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${engine === 'docx' ? 'bg-[var(--accent)] text-white' : 'bg-[var(--border-20)] text-[var(--text)]'}`}
+          >
+            docx (programmatic)
+          </button>
+          <button
+            onClick={() => setEngine('template')}
+            className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${engine === 'template' ? 'bg-[var(--accent)] text-white' : 'bg-[var(--border-20)] text-[var(--text)]'}`}
+          >
+            docxtemplater
+          </button>
+        </div>
+      )}
 
       <OrnamentalDivider className="max-w-xs mx-auto" />
 
