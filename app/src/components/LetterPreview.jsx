@@ -341,6 +341,20 @@ async function downloadDocxTemplate(d, lang = 'fr') {
   saveAs(out, `invitation_${L.fullName.replace(/\s+/g, '_')}_${lang.toUpperCase()}_template.docx`)
 }
 
+/* ── python-docx engine (dev only, calls local Python) ── */
+
+async function downloadDocxPython(d, lang = 'fr') {
+  const L = letterData(d)
+  const res = await fetch('/api/generate-docx', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: d, lang }),
+  })
+  if (!res.ok) throw new Error('python-docx generation failed')
+  const blob = await res.blob()
+  saveAs(blob, `invitation_${L.fullName.replace(/\s+/g, '_')}_${lang.toUpperCase()}_pydocx.docx`)
+}
+
 /* ── Supporting documents ── */
 
 const base = import.meta.env.BASE_URL
@@ -516,7 +530,7 @@ function DownloadButton({ onClick, icon: Icon, label, className }) {
 
 export default function LetterPreview({ data, onBack }) {
   const notifiedRef = useRef(false)
-  const [engine, setEngine] = useState('docx') // 'docx' | 'template'
+  const [engine, setEngine] = useState('docx') // 'docx' | 'template' | 'python'
 
   const handleFirstDownload = () => {
     if (!notifiedRef.current) {
@@ -567,13 +581,13 @@ export default function LetterPreview({ data, onBack }) {
         </motion.button>
         <div className="flex flex-wrap gap-2">
           <DownloadButton
-            onClick={() => { handleFirstDownload(); return (engine === 'template' ? downloadDocxTemplate : downloadDocx)(data, 'fr') }}
+            onClick={() => { handleFirstDownload(); const fn = engine === 'template' ? downloadDocxTemplate : engine === 'python' ? downloadDocxPython : downloadDocx; return fn(data, 'fr') }}
             icon={FileText}
             label="DOCX Français"
             className="bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] focus-visible:ring-[var(--accent)]"
           />
           <DownloadButton
-            onClick={() => { handleFirstDownload(); return (engine === 'template' ? downloadDocxTemplate : downloadDocx)(data, 'en') }}
+            onClick={() => { handleFirstDownload(); const fn = engine === 'template' ? downloadDocxTemplate : engine === 'python' ? downloadDocxPython : downloadDocx; return fn(data, 'en') }}
             icon={FileText}
             label="DOCX English"
             className="bg-[var(--accent-dark)] text-white hover:bg-[var(--accent-dark-hover)] focus-visible:ring-[var(--accent-dark)]"
@@ -596,6 +610,12 @@ export default function LetterPreview({ data, onBack }) {
             className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${engine === 'template' ? 'bg-[var(--accent)] text-white' : 'bg-[var(--border-20)] text-[var(--text)]'}`}
           >
             docxtemplater
+          </button>
+          <button
+            onClick={() => setEngine('python')}
+            className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${engine === 'python' ? 'bg-[var(--accent)] text-white' : 'bg-[var(--border-20)] text-[var(--text)]'}`}
+          >
+            python-docx
           </button>
         </div>
       )}
