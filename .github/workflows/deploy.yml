@@ -42,7 +42,7 @@ jobs:
 
       - name: Encrypt with StatiCrypt
         working-directory: app
-        run: npx staticrypt dist/index.html -p ${{ secrets.STATICRYPT_PASSWORD }} --short -d dist
+        run: npx staticrypt dist/index.html -p ${{ secrets.STATICRYPT_PASSWORD }} --short -d dist -t staticrypt-template.html --remember 30
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
