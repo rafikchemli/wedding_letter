@@ -74,14 +74,14 @@ async function generateDocxBlob(d) {
     p([t('Montréal (QC), Canada H2W 1E5')], { after: 0 }),
     p([t('Tél. : 514-793-1185')], { after: 0 }),
     p([t('Courriel : rafik.madjdi.chemli@gmail.com')], { after: 200 }),
-    p([t(`Date : ${L.today}`)], { after: 120 }),
+    p([t(`Date : ${L.today}`)], { after: 480 }),
 
     // Addressee + Subject
     p([bold('À : '), t('Immigration, Réfugiés et Citoyenneté Canada (IRCC)')], { after: 0 }),
-    p([bold('Objet : '), t(`Lettre d'invitation pour visa visiteur — ${L.fullName}`)], { after: 240 }),
+    p([bold('Objet : '), t(`Lettre d'invitation pour visa visiteur — ${L.fullName}`)], { after: 480 }),
 
     // Salutation
-    p([t('Madame, Monsieur,')], { after: 100 }),
+    p([t('Madame, Monsieur,')], { after: 480 }),
 
     // §1 — Who I am + who I invite
     p([
@@ -136,13 +136,13 @@ async function generateDocxBlob(d) {
     // §7 — Contact + Thank you
     p([
       t('Si vous avez besoin de renseignements supplémentaires, n\'hésitez pas à me contacter. Je vous remercie de votre considération.'),
-    ], { justify: true }),
+    ], { justify: true, after: 480 }),
 
     // Signature
     p([t('Cordialement,')], { after: 80 }),
     p([bold('Madjdi Rafik Chemli')], { after: 0 }),
     p([t('Senior AI Engineer — NewMathData')], { after: 0 }),
-    p([t('Citoyen canadien')], { after: 200 }),
+    p([t('Citoyen canadien')], { after: 480 }),
 
     // Enclosures
     p([bold('p.j. (pièces jointes) :', { underline: { type: 'single' } })], { after: 40 }),
@@ -185,14 +185,14 @@ function generateDocxBlobEn(d) {
     p([t('Montréal (QC), Canada H2W 1E5')], { after: 0 }),
     p([t('Phone: 514-793-1185')], { after: 0 }),
     p([t('Email: rafik.madjdi.chemli@gmail.com')], { after: 200 }),
-    p([t(`Date: ${L.todayEn}`)], { after: 120 }),
+    p([t(`Date: ${L.todayEn}`)], { after: 480 }),
 
     // Addressee + Subject
     p([bold('To: '), t('Immigration, Refugees and Citizenship Canada (IRCC)')], { after: 0 }),
-    p([bold('Subject: '), t(`Invitation Letter for Visitor Visa — ${L.fullName}`)], { after: 240 }),
+    p([bold('Subject: '), t(`Invitation Letter for Visitor Visa — ${L.fullName}`)], { after: 480 }),
 
     // Salutation
-    p([t('Dear Sir/Madam,')], { after: 100 }),
+    p([t('Dear Sir/Madam,')], { after: 480 }),
 
     // §1
     p([
@@ -246,13 +246,13 @@ function generateDocxBlobEn(d) {
     // §7 + Thank you
     p([
       t('If you require any additional information, please do not hesitate to contact me. Thank you for your consideration.'),
-    ], { justify: true }),
+    ], { justify: true, after: 480 }),
 
     // Signature
     p([t('Sincerely,')], { after: 80 }),
     p([bold('Madjdi Rafik Chemli')], { after: 0 }),
     p([t('Senior AI Engineer — NewMathData')], { after: 0 }),
-    p([t('Canadian Citizen')], { after: 200 }),
+    p([t('Canadian Citizen')], { after: 480 }),
 
     // Enclosures
     p([bold('Encl. (enclosed documents):', { underline: { type: 'single' } })], { after: 40 }),
