@@ -72,14 +72,14 @@ const frChildren = [
     t('Je soussigné, '), bold('Madjdi Rafik Chemli'),
     t(', invite {relationshipFr}, '),
     bold('{fullName}'),
-    t(', né(e) le '), bold('{dobFr}'),
+    t(', {ne} le '), bold('{dobFr}'),
     t('{passportLineFr}, résidant au '), bold('{address}'),
     t(', à me rendre visite au Canada.'),
   ], { justify: true }),
 
   p([
     t('Je suis '), bold('citoyen canadien'),
-    t(', résidant à l\'adresse mentionnée ci-dessus. Je suis citoyen canadien depuis 2006 et je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme '),
+    t(' depuis 2006, résidant à l\'adresse mentionnée ci-dessus. Je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme '),
     bold('Senior AI Engineer'),
     t(' chez '),
     bold('NewMathData'),
@@ -105,7 +105,7 @@ const frChildren = [
   p([
     t('{fullName} a des attaches solides dans son pays de résidence ({returnCountry}), notamment : '),
     bold('{returnReason}'),
-    t('. Il/elle retournera en {returnCountry} à la fin de son séjour autorisé.'),
+    t('. {ilElle} retournera en {returnCountry} à la fin de son séjour autorisé.'),
   ], { justify: true }),
 
   p([
@@ -176,13 +176,13 @@ const enChildren = [
   ], { justify: true }),
 
   p([
-    t('{fullName} has strong ties to their country of residence ({returnCountry}), including: '),
+    t('{fullName} has strong ties to {herHis} country of residence ({returnCountry}), including: '),
     bold('{returnReason}'),
-    t('. They will return to {returnCountry} at the end of their authorized stay.'),
+    t('. {heShe} will return to {returnCountry} at the end of {herHis} authorized stay.'),
   ], { justify: true }),
 
   p([
-    t('I kindly request that you grant them a Temporary Resident Visa to visit Canada.'),
+    t('I kindly request that you grant {herThem} a Temporary Resident Visa to visit Canada.'),
   ], { justify: true }),
 
   p([

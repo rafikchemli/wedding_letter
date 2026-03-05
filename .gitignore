@@ -14,3 +14,7 @@
 
 # Misc audit screenshots
 misc/
+
+# Loose screenshots in repo root
+/*.png
+/*.jpg

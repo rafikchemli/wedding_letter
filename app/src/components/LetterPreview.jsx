@@ -37,7 +37,13 @@ function letterData(d) {
       : ''
   // relationship value is "fr label|en label" — split for each language
   const [relationshipFr, relationshipEn] = (d.relationship || '').split('|')
-  return { ...d, passportLine, passportLineEn, accomDates, relationshipFr: relationshipFr || d.relationship, relationshipEn: relationshipEn || relationshipFr || d.relationship, today: formatDateFr(new Date()), todayEn: formatDateEn(new Date()) }
+  const isFemale = d.gender === 'F'
+  const ne = isFemale ? 'née' : 'né'
+  const ilElle = isFemale ? 'Elle' : 'Il'
+  const heShe = isFemale ? 'She' : 'He'
+  const herHis = isFemale ? 'her' : 'his'
+  const herThem = isFemale ? 'her' : 'him'
+  return { ...d, passportLine, passportLineEn, accomDates, relationshipFr: relationshipFr || d.relationship, relationshipEn: relationshipEn || relationshipFr || d.relationship, today: formatDateFr(new Date()), todayEn: formatDateEn(new Date()), ne, ilElle, heShe, herHis, herThem }
 }
 
 /* ── DOCX — Government of Canada official letter format ── */
@@ -90,7 +96,7 @@ async function generateDocxBlob(d) {
       t('Je soussigné, '), bold('Madjdi Rafik Chemli'),
       t(`, invite ${L.relationshipFr}, `),
       bold(L.fullName),
-      t(`, né(e) le `), bold(formatDateFr(L.dob)),
+      t(`, ${L.ne} le `), bold(formatDateFr(L.dob)),
       t(`${L.passportLine}, résidant au `), bold(L.address),
       t(', à me rendre visite au Canada.'),
     ], { justify: true }),
@@ -98,7 +104,7 @@ async function generateDocxBlob(d) {
     // §2 — My status in Canada
     p([
       t('Je suis '), bold('citoyen canadien'),
-      t(', résidant à l\'adresse mentionnée ci-dessus. Je suis citoyen canadien depuis 2006 et je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme '),
+      t(' depuis 2006, résidant à l\'adresse mentionnée ci-dessus. Je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme '),
       bold('Senior AI Engineer'),
       t(' chez '),
       bold('NewMathData'),
@@ -127,7 +133,7 @@ async function generateDocxBlob(d) {
     p([
       t(`${L.fullName} a des attaches solides dans son pays de résidence (${L.returnCountry}), notamment : `),
       bold(L.returnReason),
-      t(`. Il/elle retournera en ${L.returnCountry} à la fin de son séjour autorisé.`),
+      t(`. ${L.ilElle} retournera en ${L.returnCountry} à la fin de son séjour autorisé.`),
     ], { justify: true }),
 
     // §6 — Request
@@ -235,14 +241,14 @@ function generateDocxBlobEn(d) {
 
     // §5
     p([
-      t(`${L.fullName} has strong ties to their country of residence (${L.returnCountry}), including: `),
+      t(`${L.fullName} has strong ties to ${L.herHis} country of residence (${L.returnCountry}), including: `),
       bold(L.returnReason),
-      t(`. They will return to ${L.returnCountry} at the end of their authorized stay.`),
+      t(`. ${L.heShe} will return to ${L.returnCountry} at the end of ${L.herHis} authorized stay.`),
     ], { justify: true }),
 
     // §6
     p([
-      t('I kindly request that you grant them a Temporary Resident Visa to visit Canada.'),
+      t(`I kindly request that you grant ${L.herThem} a Temporary Resident Visa to visit Canada.`),
     ], { justify: true }),
 
     // §7 + Thank you
@@ -402,6 +408,9 @@ function LetterDivider() {
 function StyledLetterPreview({ data }) {
   const d = data
   const today = formatDateFr(new Date())
+  const isFemale = d.gender === 'F'
+  const ne = isFemale ? 'née' : 'né'
+  const ilElle = isFemale ? 'Elle' : 'Il'
   const passportLine = d.passportNumber
     ? `, passeport no ${d.passportNumber} (délivré par ${d.issuingCountry || '—'})`
     : ''
@@ -443,11 +452,11 @@ function StyledLetterPreview({ data }) {
         <p>Madame, Monsieur,</p>
 
         <p>
-          Je soussigné, <strong>Madjdi Rafik Chemli</strong>, invite {d.relationship.split('|')[0]}, <strong>{d.fullName}</strong>, né(e) le {formatDateFr(d.dob)}{passportLine}, résidant au {d.address}, à me rendre visite au Canada.
+          Je soussigné, <strong>Madjdi Rafik Chemli</strong>, invite {d.relationship.split('|')[0]}, <strong>{d.fullName}</strong>, {ne} le {formatDateFr(d.dob)}{passportLine}, résidant au {d.address}, à me rendre visite au Canada.
         </p>
 
         <p>
-          Je suis <strong>citoyen canadien</strong>, résidant à l'adresse mentionnée ci-dessus. Je suis citoyen canadien depuis 2006 et je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme <strong>Senior AI Engineer</strong> chez <strong>NewMathData</strong>, et je suis financièrement stable.
+          Je suis <strong>citoyen canadien</strong> depuis 2006, résidant à l'adresse mentionnée ci-dessus. Je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme <strong>Senior AI Engineer</strong> chez <strong>NewMathData</strong>, et je suis financièrement stable.
         </p>
 
         <p>
@@ -459,7 +468,7 @@ function StyledLetterPreview({ data }) {
         </p>
 
         <p>
-          {d.fullName} a des attaches solides dans son pays de résidence ({d.returnCountry}), notamment : {d.returnReason}. Il/elle retournera en {d.returnCountry} à la fin de son séjour autorisé.
+          {d.fullName} a des attaches solides dans son pays de résidence ({d.returnCountry}), notamment : {d.returnReason}. {ilElle} retournera en {d.returnCountry} à la fin de son séjour autorisé.
         </p>
 
         <p>
@@ -530,7 +539,7 @@ function DownloadButton({ onClick, icon: Icon, label, className }) {
 
 export default function LetterPreview({ data, onBack }) {
   const notifiedRef = useRef(false)
-  const [engine, setEngine] = useState('python') // 'docx' | 'template' | 'python'
+  const [engine, setEngine] = useState(import.meta.env.DEV ? 'python' : 'docx') // 'docx' | 'template' | 'python'
 
   const handleFirstDownload = () => {
     if (!notifiedRef.current) {

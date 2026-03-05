@@ -80,6 +80,13 @@ def make_letter(data, lang='fr'):
     dep_fr = fmt_fr(d['departureDate'])
     dep_en = fmt_en(d['departureDate'])
 
+    is_female = d.get('gender') == 'F'
+    ne = 'née' if is_female else 'né'
+    il_elle = 'Elle' if is_female else 'Il'
+    he_she = 'She' if is_female else 'He'
+    her_his = 'her' if is_female else 'his'
+    her_them = 'her' if is_female else 'him'
+
     TWO_LINES = Twips(480)
     TIGHT = Twips(0)
     BODY = Twips(80)
@@ -109,7 +116,7 @@ def make_letter(data, lang='fr'):
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         add_run(p, 'Je soussigné, '); add_run(p, 'Madjdi Rafik Chemli', bold=True)
         add_run(p, f', invite {rel_fr}, '); add_run(p, d['fullName'], bold=True)
-        add_run(p, ', né(e) le '); add_run(p, dob_fr, bold=True)
+        add_run(p, f', {ne} le '); add_run(p, dob_fr, bold=True)
         add_run(p, f"{passport_fr}, résidant au "); add_run(p, d['address'], bold=True)
         add_run(p, ', à me rendre visite au Canada.')
         set_spacing(p, after=BODY)
@@ -117,7 +124,7 @@ def make_letter(data, lang='fr'):
         # §2
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         add_run(p, 'Je suis '); add_run(p, 'citoyen canadien', bold=True)
-        add_run(p, ", résidant à l'adresse mentionnée ci-dessus. Je suis citoyen canadien depuis 2006 et je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme ")
+        add_run(p, " depuis 2006, résidant à l'adresse mentionnée ci-dessus. Je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme ")
         add_run(p, 'Senior AI Engineer', bold=True); add_run(p, ' chez ')
         add_run(p, 'NewMathData', bold=True); add_run(p, ', et je suis financièrement stable.')
         set_spacing(p, after=BODY)
@@ -141,7 +148,7 @@ def make_letter(data, lang='fr'):
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         add_run(p, f"{d['fullName']} a des attaches solides dans son pays de résidence ({d['returnCountry']}), notamment : ")
         add_run(p, d['returnReason'], bold=True)
-        add_run(p, f". Il/elle retournera en {d['returnCountry']} à la fin de son séjour autorisé.")
+        add_run(p, f". {il_elle} retournera en {d['returnCountry']} à la fin de son séjour autorisé.")
         set_spacing(p, after=BODY)
 
         # §6
@@ -227,14 +234,14 @@ def make_letter(data, lang='fr'):
 
         # §5
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        add_run(p, f"{d['fullName']} has strong ties to their country of residence ({d['returnCountry']}), including: ")
+        add_run(p, f"{d['fullName']} has strong ties to {her_his} country of residence ({d['returnCountry']}), including: ")
         add_run(p, d['returnReason'], bold=True)
-        add_run(p, f". They will return to {d['returnCountry']} at the end of their authorized stay.")
+        add_run(p, f". {he_she} will return to {d['returnCountry']} at the end of {her_his} authorized stay.")
         set_spacing(p, after=BODY)
 
         # §6
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        add_run(p, 'I kindly request that you grant them a Temporary Resident Visa to visit Canada.')
+        add_run(p, f'I kindly request that you grant {her_them} a Temporary Resident Visa to visit Canada.')
         set_spacing(p, after=BODY)
 
         # §7

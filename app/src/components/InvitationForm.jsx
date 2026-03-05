@@ -73,6 +73,7 @@ function Section({ icon: Icon, title, children, delay = 0 }) {
 
 const defaultForm = {
   fullName: '',
+  gender: '',
   dob: '',
   nationality: '',
   address: '',
@@ -94,6 +95,7 @@ const defaultForm = {
 
 const mockForm = {
   fullName: 'Jean-Mouloud Belkacem',
+  gender: 'M',
   dob: '1990-05-14',
   nationality: 'Algérienne',
   address: '42 Rue Didouche Mourad, Alger, Algérie',
@@ -254,7 +256,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     setSubmitted(true)
-    const requiredFields = ['fullName', 'dob', 'nationality', 'address', 'phone', 'email', 'arrivalDate', 'departureDate', 'returnCountry', 'returnReason', 'relationship']
+    const requiredFields = ['fullName', 'gender', 'dob', 'nationality', 'address', 'phone', 'email', 'arrivalDate', 'departureDate', 'returnCountry', 'returnReason', 'relationship']
     const hasErrors = requiredFields.some((k) => validate(k))
     if (hasErrors) return
     onSubmit({ ...form, duration: duration() })
@@ -286,6 +288,24 @@ export default function InvitationForm({ onSubmit, initialData }) {
               <Input value={form.fullName} onChange={set('fullName')} placeholder="Jean-Mouloud Belkacem" required error={submitted && validate('fullName')} autoComplete="name" />
             </Field>
           </div>
+          <Field label="Genre" required error={submitted && validate('gender')}>
+            <select
+              value={form.gender}
+              onChange={(e) => set('gender')(e.target.value)}
+              required
+              className={`w-full rounded-xl bg-[var(--surface)] border px-4 py-2.5 text-sm text-[var(--text)]
+                focus:ring-2 focus:ring-[var(--accent-20)]
+                focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
+                transition-all duration-200 outline-none cursor-pointer appearance-none
+                ${!form.gender ? 'text-[var(--text-muted-60)]' : ''}
+                ${submitted && validate('gender') ? 'border-red-400' : 'border-[var(--border-40)] focus:border-[var(--accent)]'}`}
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A6B55' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+            >
+              <option value="" disabled>Choisir...</option>
+              <option value="M">Masculin</option>
+              <option value="F">Féminin</option>
+            </select>
+          </Field>
           <Field label="Date de naissance" required helper="Format AAAA-MM-JJ" error={submitted && validate('dob')}>
             <Input type="date" value={form.dob} onChange={set('dob')} required error={submitted && validate('dob')} autoComplete="bday" />
           </Field>
