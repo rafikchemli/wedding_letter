@@ -465,8 +465,8 @@ function animateSand(ctx, particles, w, h, time) {
         continue
       }
 
-      // Streaks ride wind hard — depth-scaled response
-      const streakWind = 0.8 + p.depth * 1.2
+      // Streaks ride wind — depth-scaled response
+      const streakWind = 0.6 + p.depth * 0.7
       p.x += p.windSpeed + wx * streakWind
       p.y += p.drift + wy * 0.5 + wobble
 
@@ -489,7 +489,7 @@ function animateSand(ctx, particles, w, h, time) {
       }
 
       // Grains lift off the crest then arc back down (gravity)
-      const grainWind = 0.4 + p.depth * 0.8
+      const grainWind = 0.3 + p.depth * 0.5
       p.vy += p.fall  // gravity accumulates
       p.x += p.windSpeed + wx * grainWind
       p.y += p.vy + wy * 0.3 + wobble
@@ -587,7 +587,7 @@ function animateStreams(ctx, particles, w, h, time) {
     const wobble = Math.sin(time * p.wobbleFreq + p.phase) * p.wobbleAmp
 
     // Fast horizontal, very slight vertical undulation
-    p.x += p.speed + wx * 1.2
+    p.x += p.speed + wx * 0.7
     p.y += wobble + wy * 0.15
 
     // Keep within ground zone (crest → bottom of screen)

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import { FileText, ChevronDown } from 'lucide-react'
 import '@theme-toggles/react/css/Simple.css'
 import { Simple } from '@theme-toggles/react'
@@ -7,6 +7,7 @@ import InvitationForm from './components/InvitationForm'
 import LetterPreview from './components/LetterPreview'
 import ParticleSystem from './components/ParticleSystem'
 import OrnamentalDivider from './components/OrnamentalDivider'
+import AmbientAudio from './components/AmbientAudio'
 import './index.css'
 
 const THEMES = {
@@ -253,8 +254,10 @@ function ScrollGoldFoil({ children, delay, gradient }) {
 }
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(0)
+  const [view, setView] = useState('form')           // 'form' | 'morphing' | 'success'
+  const [morphPhase, setMorphPhase] = useState(null)   // 'exit' | 'enter' | null
   const [formData, setFormData] = useState(null)
+  const [themeFading, setThemeFading] = useState(false)
   const [theme, setTheme] = useState(() => {
     try {
       const saved = localStorage.getItem('wedding-theme')
@@ -270,19 +273,41 @@ function App() {
   })
 
   const handleThemeChange = (t) => {
-    setTheme(t)
-    document.documentElement.setAttribute('data-theme', t)
-    try { localStorage.setItem('wedding-theme', t) } catch {}
+    if (themeFading) return // ignore clicks during fade
+    setThemeFading(true)
+    setTimeout(() => {
+      setTheme(t)
+      document.documentElement.setAttribute('data-theme', t)
+      try { localStorage.setItem('wedding-theme', t) } catch {}
+      // Update favicon to match theme
+      const faviconSvg = document.querySelector('link[type="image/svg+xml"]')
+      if (faviconSvg) faviconSvg.href = t === 'snow' ? '/favicon-dark.svg' : '/favicon.svg'
+      setThemeFading(false)
+    }, 350)
   }
 
   const handleFormSubmit = (data) => {
     setFormData(data)
-    setCurrentStep(1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    // Begin morph after scroll starts
+    setTimeout(() => {
+      setView('morphing')
+      setMorphPhase('exit')
+    }, 200)
+  }
+
+  const handleExitComplete = () => {
+    setMorphPhase('enter')
+  }
+
+  const handleEnterComplete = () => {
+    setView('success')
+    setMorphPhase(null)
   }
 
   const handleBack = () => {
-    setCurrentStep(0)
+    setView('form')
+    setMorphPhase(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -309,20 +334,20 @@ function App() {
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [currentStep])
+  }, [view])
 
   return (
     <MotionConfig reducedMotion="user">
     <div
       data-theme={theme}
       className="min-h-screen relative overflow-x-hidden transition-colors duration-700"
-      style={{ backgroundColor: t.bg }}
+      style={{ backgroundColor: t.bg, opacity: themeFading ? 0 : 1, transition: 'opacity 0.35s ease-in-out' }}
     >
       <div className="grain-overlay" aria-hidden="true" />
       <ThemeToggle theme={theme} onChange={handleThemeChange} />
 
       {/* Hero — garage door: slides up on scroll to reveal form */}
-      {currentStep === 0 && (
+      {view === 'form' && (
         <div ref={heroWrapperRef} className="relative" style={{ height: '140vh' }}>
         <section
           className="hero-garage-door sticky top-0 h-dvh flex flex-col items-center overflow-hidden z-20"
@@ -350,7 +375,7 @@ function App() {
             <motion.p
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="uppercase tracking-[0.4em] mb-8 drop-shadow-sm"
               style={{ color: t.heroSub, fontSize: 'clamp(0.65rem, 0.5rem + 0.4vw, 0.85rem)' }}
             >
@@ -360,14 +385,14 @@ function App() {
             <div>
               <AnimatedName
                 text="Sandrine"
-                delay={1.5}
+                delay={0.8}
                 className="leading-[1] mb-2 drop-shadow-sm"
                 style={{ color: t.nameSandrine, fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
               />
               <motion.div
                 initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 2.3, ease: 'easeOut' }}
+                transition={{ duration: 0.6, delay: 1.5, ease: 'easeOut' }}
                 className="ornament my-4 font-display italic"
                 style={{ color: t.ampersand, '--ornament-line': t.ornamentLine, fontSize: 'clamp(1.25rem, 1rem + 0.8vw, 1.75rem)' }}
               >
@@ -375,7 +400,7 @@ function App() {
               </motion.div>
               <AnimatedName
                 text="Rafik"
-                delay={2.7}
+                delay={1.9}
                 className="leading-[1] drop-shadow-sm"
                 style={{ color: t.nameRafik, fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
               />
@@ -384,10 +409,10 @@ function App() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 3.8 }}
+              transition={{ duration: 0.8, delay: 2.6 }}
               className="mt-12 space-y-2"
             >
-              <ScrollGoldFoil delay={3.8} gradient={t.goldGradient}>
+              <ScrollGoldFoil delay={2.6} gradient={t.goldGradient}>
                 19 septembre 2026
               </ScrollGoldFoil>
               <p className="tracking-wider drop-shadow-sm" style={{ color: t.heroLight, fontSize: 'clamp(0.75rem, 0.6rem + 0.4vw, 0.9rem)' }}>
@@ -403,7 +428,7 @@ function App() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 4.4 }}
+            transition={{ duration: 0.6, delay: 3.2 }}
             className="relative z-10 text-center px-4 pb-6"
           >
             <motion.button
@@ -423,7 +448,7 @@ function App() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 5.2, duration: 0.6 }}
+              transition={{ delay: 3.8, duration: 0.6 }}
               className="mt-6"
             >
               <motion.button
@@ -442,54 +467,60 @@ function App() {
       )}
 
 
+      {/* Ambient audio */}
+      <AmbientAudio theme={theme} />
+
       {/* Main — pulled up behind the hero so it's revealed as the door opens */}
       <main
         id="form-section"
         className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 relative z-10"
-        style={currentStep === 0 ? { marginTop: '-40vh', backgroundColor: t.bg } : undefined}
+        style={view === 'form' ? { marginTop: '-40vh', backgroundColor: t.bg } : undefined}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-          >
-            {currentStep === 0 && (
-              <>
-                <motion.div
-                  className="text-center mb-10 sm:mb-14"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-100px' }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                >
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium tracking-wider uppercase mb-5"
-                    style={{ background: t.badgeBg, color: t.text }}>
-                    <FileText className="w-3.5 h-3.5" />
-                    Lettre d'invitation IRCC
-                  </div>
-                  <h2 className="font-display text-3xl sm:text-4xl font-semibold mb-4 leading-[1.2] text-balance" style={{ color: t.text }}>
-                    Générez votre lettre d'invitation
-                  </h2>
-                  <p className="text-base max-w-lg mx-auto leading-relaxed text-pretty" style={{ color: t.textSoft }}>
-                    Remplissez le formulaire ci-dessous pour générer une lettre officielle
-                    pour votre demande de visa visiteur au Canada.
-                  </p>
+        {/* Form view — visible during form + morph exit */}
+        {(view === 'form' || (view === 'morphing' && morphPhase === 'exit')) && (
+          <>
+            <motion.div
+              initial={false}
+              animate={(view === 'morphing')
+                ? { opacity: 0, height: 0, scale: 0.97 }
+                : { opacity: 1, height: 'auto', scale: 1 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              style={{ overflow: 'hidden' }}
+            >
+              <div className="text-center mb-10 sm:mb-14">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium tracking-wider uppercase mb-5"
+                  style={{ background: t.badgeBg, color: t.text }}>
+                  <FileText className="w-3.5 h-3.5" />
+                  Lettre d'invitation IRCC
+                </div>
+                <h2 className="font-display text-3xl sm:text-4xl font-semibold mb-4 leading-[1.2] text-balance" style={{ color: t.text }}>
+                  Générez votre lettre d'invitation
+                </h2>
+                <p className="text-base max-w-lg mx-auto leading-relaxed text-pretty" style={{ color: t.textSoft }}>
+                  Remplissez le formulaire ci-dessous pour générer une lettre officielle
+                  pour votre demande de visa visiteur au Canada.
+                </p>
+                <OrnamentalDivider className="mt-8 max-w-xs mx-auto" />
+              </div>
+            </motion.div>
+            <InvitationForm
+              onSubmit={handleFormSubmit}
+              initialData={formData}
+              isExiting={view === 'morphing' && morphPhase === 'exit'}
+              onExitComplete={handleExitComplete}
+            />
+          </>
+        )}
 
-                  <OrnamentalDivider className="mt-8 max-w-xs mx-auto" />
-                </motion.div>
-                <InvitationForm onSubmit={handleFormSubmit} initialData={formData} />
-              </>
-            )}
-
-            {/* First visit: show form immediately if hero was skipped */}
-            {currentStep >= 1 && formData && (
-              <LetterPreview data={formData} onBack={handleBack} />
-            )}
-          </motion.div>
-        </AnimatePresence>
+        {/* Success view — visible during morph enter + success */}
+        {((view === 'morphing' && morphPhase === 'enter') || view === 'success') && formData && (
+          <LetterPreview
+            data={formData}
+            onBack={handleBack}
+            isEntering={view === 'morphing' && morphPhase === 'enter'}
+            onEnterComplete={handleEnterComplete}
+          />
+        )}
       </main>
 
       {/* Footer */}

@@ -117,8 +117,23 @@ h1, h2, h3, h4, h5, h6, .font-display {
   position: absolute;
   inset: 2px;
   z-index: -1;
-  background: var(--surface);
+  background: var(--ab-fill, var(--surface));
   border-radius: inherit;
+}
+
+/* ─── Download button — subtle breathing glow ─── */
+@keyframes btn-breathe {
+  0%, 100% { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  50%      { box-shadow: 0 4px 20px -2px var(--accent-30); }
+}
+
+.download-btn {
+  animation: btn-breathe 3s ease-in-out infinite;
+}
+
+.download-btn:hover {
+  animation: none;
+  box-shadow: 0 4px 16px -2px var(--accent-30);
 }
 
 @keyframes fade-in {

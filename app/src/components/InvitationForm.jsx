@@ -1,7 +1,28 @@
 import { useState, useEffect, useRef, useCallback, Children, isValidElement, cloneElement } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Plane, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileText, X } from 'lucide-react'
+import { User, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileText, X } from 'lucide-react'
+
+function Collapsible({ isExiting, delay, isLast, onExitComplete, children }) {
+  return (
+    <motion.div
+      animate={isExiting
+        ? { opacity: 0, height: 0, scale: 0.97, marginTop: 0 }
+        : { opacity: 1, height: 'auto', scale: 1 }}
+      transition={{
+        duration: 0.35,
+        delay: isExiting ? delay : 0,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      style={{ overflow: 'hidden' }}
+      onAnimationComplete={() => {
+        if (isExiting && isLast) onExitComplete?.()
+      }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 function Field({ label, required, helper, error, children }) {
   const descId = `desc-${label.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`
@@ -38,7 +59,7 @@ function Input({ value, onChange, placeholder, type = 'text', required, disabled
       required={required}
       disabled={disabled}
       aria-invalid={showError ? 'true' : undefined}
-      className={`w-full rounded-xl bg-[var(--surface)] border px-4 py-2.5 text-sm text-[var(--text)]
+      className={`w-full min-w-0 max-w-full rounded-xl bg-[var(--surface)] border px-4 py-2.5 text-sm text-[var(--text)]
         placeholder:text-[var(--text-muted-60)]
         focus:ring-2 focus:ring-[var(--accent-20)]
         focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2
@@ -171,7 +192,7 @@ function LetterTemplate() {
 
 const STORAGE_KEY = 'wedding-form-draft'
 
-export default function InvitationForm({ onSubmit, initialData }) {
+export default function InvitationForm({ onSubmit, initialData, isExiting, onExitComplete }) {
   const [form, setForm] = useState(() => {
     if (initialData) return initialData
     try {
@@ -179,6 +200,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
       return saved ? { ...defaultForm, ...JSON.parse(saved) } : defaultForm
     } catch { return defaultForm }
   })
+  const today = new Date().toISOString().split('T')[0]
   const [showTemplate, setShowTemplate] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const templateTriggerRef = useRef(null)
@@ -281,6 +303,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
         </button>
       )}
       {/* 1. Visitor Identity */}
+      <Collapsible isExiting={isExiting} delay={0}>
       <Section icon={User} title="1. Identité du visiteur" delay={0}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="sm:col-span-2">
@@ -307,7 +330,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
             </select>
           </Field>
           <Field label="Date de naissance" required helper="Format AAAA-MM-JJ" error={submitted && validate('dob')}>
-            <Input type="date" value={form.dob} onChange={set('dob')} required error={submitted && validate('dob')} autoComplete="bday" />
+            <Input type="date" value={form.dob} onChange={set('dob')} required error={submitted && validate('dob')} autoComplete="bday" max={today} />
           </Field>
           <Field label="Nationalité" required error={submitted && validate('nationality')}>
             <Input value={form.nationality} onChange={set('nationality')} placeholder="Algérienne" required error={submitted && validate('nationality')} />
@@ -325,45 +348,31 @@ export default function InvitationForm({ onSubmit, initialData }) {
           </Field>
         </div>
       </Section>
+      </Collapsible>
 
-      {/* 2. Travel Details */}
-      <Section icon={Plane} title="2. Détails du voyage" delay={0.05}>
-        <Field label="Motif du voyage">
-          <Input value={form.purpose} onChange={set('purpose')} disabled />
-        </Field>
+      {/* 2. Accommodation */}
+      <Collapsible isExiting={isExiting} delay={0.05}>
+      <Section icon={Home} title="2. Hébergement" delay={0.05}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <Field label="Date d'arrivée" required error={submitted && validate('arrivalDate')}>
-            <Input type="date" value={form.arrivalDate} onChange={set('arrivalDate')} required error={submitted && validate('arrivalDate')} />
+            <Input type="date" value={form.arrivalDate} onChange={set('arrivalDate')} required error={submitted && validate('arrivalDate')} min={today} />
           </Field>
           <Field label="Date de départ" required error={submitted && validate('departureDate')}>
-            <Input type="date" value={form.departureDate} onChange={set('departureDate')} required error={submitted && validate('departureDate')} />
+            <Input type="date" value={form.departureDate} onChange={set('departureDate')} required error={submitted && validate('departureDate')} min={form.arrivalDate || today} />
           </Field>
           <Field label="Durée totale" helper="Calculée automatiquement">
             <Input value={duration()} disabled placeholder="—" />
           </Field>
         </div>
-        <Field label="Ville au Canada">
-          <Input value={form.cityInCanada} onChange={set('cityInCanada')} disabled />
-        </Field>
-      </Section>
-
-      {/* 3. Accommodation */}
-      <Section icon={Home} title="3. Hébergement" delay={0.1}>
         <Field label="Adresse au Canada">
           <Input value={form.accommodationAddress} onChange={set('accommodationAddress')} />
         </Field>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="Début hébergement (si différent)" helper="Optionnel">
-            <Input type="date" value={form.accommodationDatesStart} onChange={set('accommodationDatesStart')} />
-          </Field>
-          <Field label="Fin hébergement (si différent)" helper="Optionnel">
-            <Input type="date" value={form.accommodationDatesEnd} onChange={set('accommodationDatesEnd')} />
-          </Field>
-        </div>
       </Section>
+      </Collapsible>
 
-      {/* 4. Return */}
-      <Section icon={RotateCcw} title="4. Retour après la visite" delay={0.15}>
+      {/* 3. Return */}
+      <Collapsible isExiting={isExiting} delay={0.1}>
+      <Section icon={RotateCcw} title="3. Retour après la visite" delay={0.1}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Pays de retour" required error={submitted && validate('returnCountry')}>
             <Input value={form.returnCountry} onChange={set('returnCountry')} placeholder="Algérie" required error={submitted && validate('returnCountry')} autoComplete="country-name" />
@@ -373,9 +382,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
           </Field>
         </div>
       </Section>
+      </Collapsible>
 
-      {/* 5. Passport */}
-      <Section icon={BookOpen} title="5. Passeport (optionnel)" delay={0.2}>
+      {/* 4. Passport */}
+      <Collapsible isExiting={isExiting} delay={0.15}>
+      <Section icon={BookOpen} title="4. Passeport (optionnel)" delay={0.15}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Field label="Numéro de passeport">
             <Input value={form.passportNumber} onChange={set('passportNumber')} placeholder="DZ1234567" />
@@ -385,9 +396,11 @@ export default function InvitationForm({ onSubmit, initialData }) {
           </Field>
         </div>
       </Section>
+      </Collapsible>
 
-      {/* 6. Relationship */}
-      <Section icon={Users} title="6. Lien avec l'hôte" delay={0.25}>
+      {/* 5. Relationship */}
+      <Collapsible isExiting={isExiting} delay={0.2}>
+      <Section icon={Users} title="5. Lien avec l'hôte" delay={0.2}>
         <Field label="Relation avec Madjdi Rafik Chemli" required error={submitted && validate('relationship')}>
           <select
             value={form.relationship}
@@ -406,17 +419,16 @@ export default function InvitationForm({ onSubmit, initialData }) {
             <option value="mon ami proche|my close friend">Ami proche</option>
             <option value="mon cousin|my cousin">Cousin</option>
             <option value="ma cousine|my cousin">Cousine</option>
-            <option value="mon frère|my brother">Frère</option>
-            <option value="ma sœur|my sister">Sœur</option>
             <option value="mon oncle|my uncle">Oncle</option>
             <option value="ma tante|my aunt">Tante</option>
-            <option value="mon collègue|my colleague">Collègue</option>
             <option value="un membre de ma famille|a member of my family">Autre membre de la famille</option>
           </select>
         </Field>
       </Section>
+      </Collapsible>
 
       {/* Template preview trigger */}
+      <Collapsible isExiting={isExiting} delay={0.3}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -436,6 +448,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
           Voir le modèle de lettre
         </button>
       </motion.div>
+      </Collapsible>
 
       {/* Full-screen template modal */}
       {createPortal(
@@ -510,6 +523,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
       )}
 
       {/* Submit */}
+      <Collapsible isExiting={isExiting} delay={0.35} isLast onExitComplete={onExitComplete}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -530,6 +544,7 @@ export default function InvitationForm({ onSubmit, initialData }) {
           <ChevronRight className="w-4 h-4" />
         </motion.button>
       </motion.div>
+      </Collapsible>
     </form>
   )
 }

@@ -40,6 +40,10 @@ jobs:
           VITE_EMAILJS_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}
           VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
 
+      - name: Encrypt with StatiCrypt
+        working-directory: app
+        run: npx staticrypt dist/index.html -p ${{ secrets.STATICRYPT_PASSWORD }} --short -d dist
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
