@@ -39,7 +39,7 @@ def set_spacing(para, after=Twips(80), before=Twips(0)):
     pf = para.paragraph_format
     pf.space_after = after
     pf.space_before = before
-    pf.line_spacing = Pt(12)  # single spacing for 11pt
+    pf.line_spacing = 1.0  # single spacing (lineRule="auto")
 
 def make_letter(data, lang='fr'):
     doc = Document()
@@ -53,10 +53,14 @@ def make_letter(data, lang='fr'):
     section.left_margin = Twips(1200)
     section.right_margin = Twips(1200)
 
-    # Set default font
+    # Reset default Normal style (python-docx template has space_after=200)
     style = doc.styles['Normal']
     style.font.name = 'Times New Roman'
     style.font.size = Pt(11)
+    style.font.color.rgb = None  # inherit (black)
+    style.paragraph_format.space_after = Twips(0)
+    style.paragraph_format.space_before = Twips(0)
+    style.paragraph_format.line_spacing = 1.0
 
     d = data
     rel_parts = (d.get('relationship') or '').split('|')

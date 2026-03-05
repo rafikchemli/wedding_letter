@@ -530,7 +530,7 @@ function DownloadButton({ onClick, icon: Icon, label, className }) {
 
 export default function LetterPreview({ data, onBack }) {
   const notifiedRef = useRef(false)
-  const [engine, setEngine] = useState('docx') // 'docx' | 'template' | 'python'
+  const [engine, setEngine] = useState('python') // 'docx' | 'template' | 'python'
 
   const handleFirstDownload = () => {
     if (!notifiedRef.current) {
