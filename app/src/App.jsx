@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate, MotionConfig } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 import { FileText, ChevronDown } from 'lucide-react'
 import '@theme-toggles/react/css/Simple.css'
 import { Simple } from '@theme-toggles/react'
@@ -230,23 +230,17 @@ function AnimatedName({ text, delay = 0, className: cls = '', style }) {
 }
 
 function ScrollGoldFoil({ children, delay, gradient }) {
-  const ref = useRef(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const x = useTransform(scrollYProgress, [0, 1], [-200, 200])
-  const backgroundPosition = useMotionTemplate`${x}% center`
-
   return (
     <motion.p
-      ref={ref}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, delay }}
-      className="font-display font-semibold tracking-widest uppercase drop-shadow-sm"
+      className="scroll-gold-foil font-display font-semibold tracking-widest uppercase drop-shadow-sm"
       style={{
         fontSize: 'clamp(1rem, 0.8rem + 0.6vw, 1.25rem)',
         backgroundImage: gradient,
         backgroundSize: '250% auto',
-        backgroundPosition,
+        backgroundPosition: '-200% center',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
@@ -292,13 +286,24 @@ function App() {
 
   const t = THEMES[theme]
 
-  // Garage door — hero slides up as you scroll, revealing content below
+  // Garage door wrapper ref — used by IntersectionObserver to pause particles
   const heroWrapperRef = useRef(null)
-  const { scrollYProgress: heroScroll } = useScroll({
-    target: heroWrapperRef,
-    offset: ['start start', 'end start'],
-  })
-  const heroY = useTransform(heroScroll, [0.1, 0.85], ['0%', '-100%'])
+
+  // Track hero visibility — particles pause when offscreen
+  const heroVisibleRef = useRef(true)
+  useEffect(() => {
+    const el = heroWrapperRef.current
+    if (!el) {
+      heroVisibleRef.current = false
+      return
+    }
+    const obs = new IntersectionObserver(
+      ([entry]) => { heroVisibleRef.current = entry.isIntersecting },
+      { rootMargin: '200px' }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [currentStep])
 
   return (
     <MotionConfig reducedMotion="user">
@@ -313,17 +318,18 @@ function App() {
       {/* Hero — garage door: slides up on scroll to reveal form */}
       {currentStep === 0 && (
         <div ref={heroWrapperRef} className="relative" style={{ height: '140vh' }}>
-        <motion.section
-          className="sticky top-0 h-dvh flex flex-col items-center overflow-hidden z-20"
-          style={{ y: heroY, boxShadow: '0 8px 30px rgba(0,0,0,0.08)' }}
+        <section
+          className="hero-garage-door sticky top-0 h-dvh flex flex-col items-center overflow-hidden z-20"
         >
           {/* Themed background */}
           <div className="absolute inset-0 z-0">
             <HeroSvg theme={theme} />
             <div className="absolute inset-0" style={{ background: t.overlay }} />
             <div className="absolute inset-0" style={{ background: t.tint }} />
-            <ParticleSystem theme={theme} />
           </div>
+
+          {/* Particles — fixed inside hero (will-change:transform contains it, overflow:hidden clips it) */}
+          <ParticleSystem theme={theme} activeRef={heroVisibleRef} />
 
           {/* Top spacer — pushes names to center, shrinks on small screens */}
           <div className="flex-1 min-h-8 sm:min-h-0" />
@@ -422,7 +428,7 @@ function App() {
               </motion.div>
             </motion.div>
           </motion.div>
-        </motion.section>
+        </section>
         </div>
       )}
 
