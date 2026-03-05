@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, Children, isValidElement, cloneElement } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileText, X } from 'lucide-react'
+import { User, Home, RotateCcw, BookOpen, Users, ChevronRight, Eye, FileText, X, ExternalLink, Link } from 'lucide-react'
 
 function Collapsible({ isExiting, delay, isLast, onExitComplete, children }) {
   return (

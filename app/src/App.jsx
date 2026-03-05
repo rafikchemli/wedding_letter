@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, MotionConfig } from 'framer-motion'
-import { FileText, ChevronDown } from 'lucide-react'
+import { FileText, ChevronDown, ExternalLink, Link } from 'lucide-react'
 import '@theme-toggles/react/css/Simple.css'
 import { Simple } from '@theme-toggles/react'
 import InvitationForm from './components/InvitationForm'
@@ -502,6 +502,65 @@ function App() {
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               style={{ overflow: 'hidden' }}
             >
+              {/* Useful links section */}
+              <div className="text-center mb-10 sm:mb-14">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium tracking-wider uppercase mb-5"
+                  style={{ background: t.badgeBg, color: t.text }}>
+                  <Link className="w-3.5 h-3.5" />
+                  Ressources visa Canada
+                </div>
+                <h2 className="font-display text-3xl sm:text-4xl font-semibold mb-4 leading-[1.2] text-balance" style={{ color: t.text }}>
+                  Préparez votre demande
+                </h2>
+                <p className="text-base max-w-lg mx-auto leading-relaxed text-pretty" style={{ color: t.textSoft }}>
+                  Consultez ces ressources officielles et communautaires avant de commencer votre demande de visa visiteur.
+                </p>
+                <OrnamentalDivider className="mt-8 max-w-xs mx-auto" />
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="space-y-3 mb-16 sm:mb-20"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a href="https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/apply-visitor-visa.html" target="_blank" rel="noopener noreferrer"
+                    className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-[var(--surface)] border border-[var(--border-30)] hover:border-[var(--accent-20)] hover:shadow-md transition-all duration-200 group">
+                    <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">Demande de visa visiteur — IRCC</span>
+                      <span className="text-xs text-[var(--text-muted-70)]">Guide officiel du gouvernement du Canada</span>
+                    </div>
+                  </a>
+                  <a href="https://www.vfsglobal.ca/canada/" target="_blank" rel="noopener noreferrer"
+                    className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-[var(--surface)] border border-[var(--border-30)] hover:border-[var(--accent-20)] hover:shadow-md transition-all duration-200 group">
+                    <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">VFS Global Canada</span>
+                      <span className="text-xs text-[var(--text-muted-70)]">Prise de rendez-vous et dépôt de dossier</span>
+                    </div>
+                  </a>
+                  <a href="https://www.reddit.com/r/CanadaVisitorVisa/" target="_blank" rel="noopener noreferrer"
+                    className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-[var(--surface)] border border-[var(--border-30)] hover:border-[var(--accent-20)] hover:shadow-md transition-all duration-200 group">
+                    <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">r/CanadaVisitorVisa — Reddit</span>
+                      <span className="text-xs text-[var(--text-muted-70)]">Communauté Reddit — questions et retours d{'\u2019'}expérience</span>
+                    </div>
+                  </a>
+                  <a href="https://www.facebook.com/groups/2386718511610313/" target="_blank" rel="noopener noreferrer"
+                    className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-[var(--surface)] border border-[var(--border-30)] hover:border-[var(--accent-20)] hover:shadow-md transition-all duration-200 group">
+                    <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">Visa Canada — Facebook</span>
+                      <span className="text-xs text-[var(--text-muted-70)]">Groupe d{'\u2019'}entraide pour les demandes de visa</span>
+                    </div>
+                  </a>
+                </div>
+              </motion.div>
+
               <div className="text-center mb-10 sm:mb-14">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium tracking-wider uppercase mb-5"
                   style={{ background: t.badgeBg, color: t.text }}>
