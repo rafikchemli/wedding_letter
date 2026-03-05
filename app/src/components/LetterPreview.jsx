@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, FileText, Check, Loader2, Download, Archive, Paperclip, ExternalLink, Link } from 'lucide-react'
-import { Document, Packer, Paragraph, TextRun, AlignmentType, UnderlineType } from 'docx'
+import { Document, Packer, Paragraph, TextRun, AlignmentType, UnderlineType, LineRuleType } from 'docx'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import PizZip from 'pizzip'
@@ -57,7 +57,7 @@ function p(runs, opts = {}) {
   const { after = 80, before = 0, indent, justify, ...rest } = opts
   return new Paragraph({
     children: Array.isArray(runs) ? runs : [runs],
-    spacing: { after, before, line: LINE },
+    spacing: { after, before, line: LINE, lineRule: LineRuleType.AUTO },
     ...(justify ? { alignment: AlignmentType.BOTH } : {}),
     ...(indent ? { indent: { left: indent } } : {}),
     ...rest,
@@ -165,7 +165,7 @@ async function generateDocxBlob(d) {
       default: {
         document: {
           run: { font: FONT, size: SZ, color: '000000' },
-          paragraph: { spacing: { after: 80, line: LINE } },
+          paragraph: { spacing: { after: 80, line: LINE, lineRule: LineRuleType.AUTO } },
         },
       },
     },
@@ -275,7 +275,7 @@ function generateDocxBlobEn(d) {
       default: {
         document: {
           run: { font: FONT, size: SZ, color: '000000' },
-          paragraph: { spacing: { after: 80, line: LINE } },
+          paragraph: { spacing: { after: 80, line: LINE, lineRule: LineRuleType.AUTO } },
         },
       },
     },
