@@ -139,6 +139,7 @@ const mockForm = {
 const isDev = import.meta.env.DEV
 
 function LetterTemplate() {
+  const M = (children) => <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">{children}</mark>
   return (
     <div
       className="text-[var(--text)] leading-[1.85] space-y-[1em]"
@@ -148,44 +149,63 @@ function LetterTemplate() {
       }}
     >
       <div className="text-center mb-[1em]">
-        <p className="font-semibold">Madjdi Rafik Chemli</p>
-        <p className="text-[0.85em] text-[var(--text-muted)]">308-267 Rachel Est, Montréal (QC), Canada H2W 1E5</p>
+        <p className="font-semibold">MADJDI RAFIK CHEMLI</p>
+        <div className="text-[0.85em] text-[var(--text-muted)]">
+          <p>308-267 Rachel Est</p>
+          <p>Montréal (QC), Canada, H2W 1E5</p>
+          <p>Tél. : 514-793-1185</p>
+          <p>Courriel : rafik.madjdi.chemli@gmail.com</p>
+        </div>
       </div>
       <div className="h-px bg-[var(--border-30)]" />
-      <p className="text-[var(--text-muted)] text-[0.85em]">Date : <span className="italic">[date du jour]</span></p>
-      <p className="text-[var(--text-muted)] text-[0.85em]">À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
+      <p className="text-[var(--text-muted)] text-[0.85em]">Montréal, le <span className="italic">[date du jour]</span></p>
+      <div className="text-[var(--text-muted)] text-[0.85em]">
+        <p>À l{'\u2019'}attention de l{'\u2019'}agent des visas,</p>
+        <p>Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
+      </div>
       <p className="font-semibold text-[var(--text)]">
-        Objet : Lettre d'invitation — Demande de visa visiteur pour <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom du visiteur]</mark>
+        Objet&nbsp;: Lettre d{'\u2019'}invitation — Demande de visa de résident temporaire (visiteur) de {M('[M./Mme]')}&nbsp;{M('[Nom du visiteur]')}
       </p>
       <div className="h-px bg-[var(--border-30)]" />
       <p>
-        Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom du visiteur]</mark>, né(e) le <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date de naissance]</mark>, de nationalité <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[nationalité]</mark>, résidant au <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[adresse]</mark>, téléphone <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[tél]</mark>, courriel <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[courriel]</mark>, à venir au Canada pour un séjour temporaire.
+        Je soussigné, <strong>Madjdi Rafik Chemli</strong>, citoyen canadien depuis 2006, résidant au Canada de façon continue depuis 2014, actuellement employé à titre de <strong>Senior AI Engineer</strong> chez <strong>NewMathData</strong>, demeurant à l{'\u2019'}adresse indiquée ci‑dessus, invite par la présente&nbsp;:
+      </p>
+      <p>
+        {M('[M./Mme]')}&nbsp;<strong>{M('[Nom du visiteur]')}</strong>, {M('[né/née]')} le <strong>{M('[date de naissance]')}</strong>, titulaire du passeport n°&nbsp;{M('[n° passeport]')} ({M('[pays émetteur]')}), {M('[domicilié/domiciliée]')} au <strong>{M('[adresse]')}</strong>, téléphone&nbsp;: {M('[tél]')}.
+      </p>
+      <p>
+        Je précise que {M('[M./Mme]')}&nbsp;{M('[Nom]')} est {M('[relation]')} et que cette invitation est faite dans le seul but d{'\u2019'}une visite temporaire au Canada.
       </p>
       <p className="font-medium text-[var(--accent)]">
-        Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.
+        La présente visite a pour objet de permettre à {M('[M./Mme]')}&nbsp;{M('[Nom]')} d{'\u2019'}assister à mon mariage, prévu le <strong>19 septembre 2026</strong> à la salle <strong>L{'\u2019'}Éloi, à Montréal (Québec)</strong>. La période de séjour prévue est du <strong>{M('[date d\'arrivée]')}</strong> au <strong>{M('[date de départ]')}</strong> ({M('[durée]')}). {M('[Il/Elle]')} quittera le Canada au plus tard le {M('[date de départ]')}, afin de retourner en {M('[pays de retour]')}.
       </p>
       <p>
-        Dates prévues du séjour : du <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date d'arrivée]</mark> au <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date de départ]</mark> (durée totale : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[X jours]</mark>).
+        Pendant la durée de son séjour, {M('[M./Mme]')}&nbsp;{M('[Nom]')} logera à mon domicile, à l{'\u2019'}adresse indiquée en en‑tête. Je confirme que je prendrai en charge l{'\u2019'}hébergement pour la totalité du séjour. {M('[M./Mme]')}&nbsp;{M('[Nom]')} assumera toutes les autres dépenses liées au voyage et au séjour, notamment&nbsp;: billets d{'\u2019'}avion (aller‑retour), transport, repas et dépenses personnelles.
       </p>
       <p>
-        Hébergement : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur.
+        À ma connaissance, {M('[M./Mme]')}&nbsp;{M('[Nom]')} dispose d{'\u2019'}attaches solides dans son pays de résidence, notamment&nbsp;: <strong>{M('[raison de retour]')}</strong>, et {M('[il/elle]')} a l{'\u2019'}intention de reprendre ses obligations professionnelles à l{'\u2019'}issue de son séjour autorisé.
       </p>
       <p>
-        Dispositions financières : je prendrai en charge l'hébergement de <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> à mon domicile. <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> assumera les autres frais liés à son voyage.
+        Je comprends que ce séjour est strictement temporaire. {M('[M./Mme]')}&nbsp;{M('[Nom]')} s{'\u2019'}engage à respecter les conditions applicables aux visiteurs, notamment à ne pas travailler et à ne pas étudier au Canada sans autorisation.
       </p>
       <p>
-        Départ du Canada : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[Nom]</mark> quittera le Canada au plus tard le <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[date de départ]</mark> afin de retourner en <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[pays de retour]</mark>.
+        Je demeure à votre disposition pour tout renseignement complémentaire. Merci de l{'\u2019'}attention portée à la présente.
       </p>
+      <p className="italic text-[var(--text-muted)]">Veuillez agréer, Madame, Monsieur, l{'\u2019'}expression de mes salutations distinguées.</p>
       <div className="h-px bg-[var(--border-30)]" />
-      <div className="text-[0.85em] text-[var(--text-muted)] space-y-[0.25em]">
-        <p>Conjointe : Sandrine Martelle, née le 3 février 1995.</p>
-        <p>Lien avec le visiteur : <mark className="bg-[var(--accent-15)] text-[var(--text)] rounded px-1">[relation]</mark></p>
-        <p>Poste : Scientifique principal des données (EC-05)</p>
-        <p>Employeur : Gouvernement du Canada — Statistique Canada — CAIRE (Centre de recherche et d'expertise en IA)</p>
+      <div>
+        <p className="font-semibold">Madjdi Rafik Chemli</p>
+        <p className="text-[0.85em] text-[var(--text-muted)]">Senior AI Engineer — NewMathData</p>
+        <p className="text-[0.85em] text-[var(--text-muted)]">Citoyen canadien</p>
       </div>
       <div className="h-px bg-[var(--border-30)]" />
-      <p className="italic text-[var(--text-muted)]">Cordialement,</p>
-      <p className="font-semibold">Madjdi Rafik Chemli</p>
+      <div className="text-[0.85em] text-[var(--text-muted)] space-y-[0.25em]">
+        <p className="font-semibold text-[var(--text)]">Pièces jointes (de l{'\u2019'}hôte) — copies&nbsp;:</p>
+        <p>Copie preuve de citoyenneté&nbsp;: passeport canadien (page d{'\u2019'}identité) et/ou certificat</p>
+        <p>Preuve d{'\u2019'}adresse au Canada&nbsp;: facture de services publics</p>
+        <p>Lettre d{'\u2019'}emploi / preuves d{'\u2019'}emploi</p>
+        <p>Preuve liée au mariage&nbsp;: réservation de salle / confirmation</p>
+      </div>
     </div>
   )
 }
