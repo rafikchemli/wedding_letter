@@ -29,7 +29,7 @@ function Field({ label, required, helper, error, children }) {
   const hasDesc = !!(error || helper)
 
   return (
-    <div>
+    <div className="min-w-0">
       <label className="block text-sm font-medium text-[var(--text)] mb-1.5">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
