@@ -43,14 +43,12 @@ function createSnowflake(w, h, scattered) {
     color: `rgb(${r},${g},${b})`,
     // Depth-scaled opacity — far: faint (0.2–0.4), close: opaque (0.7–0.9)
     opacity: (0.2 + Math.random() * 0.2) + depth * 0.5,
-    // Depth-scaled speed: close/big flakes fall faster, far/small ones drift gently
-    // depth 0 → slow (0.6–1.2), depth 1 → fast (1.8–3.6)
-    fallSpeed: (0.6 + Math.random() * 0.6) + depth * (1.2 + Math.random() * 1.8),
-    drift: (0.15 + Math.random() * 0.25) + depth * (0.3 + Math.random() * 0.6),
+    // Faster, angled fall — consistent rightward slant like real wind-driven snow
+    fallSpeed: 1.2 + Math.random() * 2.0 + depth * 0.6,
+    drift: 0.3 + Math.random() * 0.8 + depth * 0.3,
     // Small wobble — NOT floaty, just a slight jitter
-    wobbleAmp: 0.15 + Math.random() * 0.3 + depth * 0.3,
-    // Wobble freq by depth — far: slow (1.5–3.0), close: fast (3.5–5.0)
-    wobbleFreq: (1.5 + Math.random() * 1.5) + depth * 2.0,
+    wobbleAmp: 0.2 + Math.random() * 0.5,
+    wobbleFreq: 2 + Math.random() * 3,
     phase: Math.random() * Math.PI * 2,
   }
 }
@@ -64,10 +62,9 @@ function animateSnow(ctx, particles, w, h, time) {
   for (const p of particles) {
     const wobble = Math.sin(time * p.wobbleFreq + p.phase) * p.wobbleAmp
 
-    // Depth-aware wind response — far: barely respond, close: ride gusts hard
-    const windResponse = 0.3 + p.depth * 0.7
+    // Small flakes blown more by gusts (inverse size)
     p.y += p.fallSpeed
-    p.x += p.drift + wobble + gust * windResponse
+    p.x += p.drift + wobble + gust * (0.5 / p.size)
 
     // Terrain occlusion — flake disappears behind its depth-matched snowbank
     const terrainY = sampleTerrainY(p.depthLayer, p.x, w, h)
@@ -95,6 +92,64 @@ function animateSnow(ctx, particles, w, h, time) {
     ctx.fillStyle = '#FFFFFF'
     ctx.beginPath()
     ctx.arc(p.x - p.size * 0.2, p.y - p.size * 0.2, p.size * 0.35, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Minimal sparkle — only tiny far flakes, extremely rare
+    if (p.depth < 0.25 && Math.random() < 0.003) {
+      ctx.globalAlpha = 0.8
+      ctx.fillStyle = '#F0F8FF'
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.size * 1.1, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+}
+
+/* ── Snow bank sparkles — fixed glitter points on the terrain surface ── */
+
+const BANK_SPARKLE_COUNT = { desktop: 40, mobile: 18 }
+
+function createBankSparkles(w, h, isMobile) {
+  const count = isMobile ? BANK_SPARKLE_COUNT.mobile : BANK_SPARKLE_COUNT.desktop
+  const sparkles = []
+  for (let i = 0; i < count; i++) {
+    // Pick a random crest layer and position along it
+    const layer = Math.floor(Math.random() * SNOW_CRESTS.length)
+    const t = Math.random()
+    const crest = SNOW_CRESTS[layer]
+    const n = crest.length - 1
+    const idx = Math.min(Math.floor(t * n), n - 1)
+    const f = (t * n) - idx
+    const svgX = crest[idx][0] + (crest[idx + 1][0] - crest[idx][0]) * f
+    const svgY = crest[idx][1] + (crest[idx + 1][1] - crest[idx][1]) * f
+    // Scatter slightly below the crest line (on the snow surface)
+    const offsetY = Math.random() * 15
+    const { x, y } = svgToScreen(svgX, svgY + offsetY, w, h)
+    sparkles.push({
+      x, y,
+      size: 0.8 + Math.random() * 1.5,
+      phase: Math.random() * Math.PI * 2,
+      freq: 0.4 + Math.random() * 0.8,
+      peakOpacity: 0.5 + Math.random() * 0.4,
+      layer,
+    })
+  }
+  return sparkles
+}
+
+function animateBankSparkles(ctx, sparkles, time) {
+  for (const s of sparkles) {
+    // Twinkle: sharp on/off pulse
+    const wave = Math.sin(time * s.freq + s.phase)
+    // Only visible during the peak of the sine wave (top 20%)
+    if (wave < 0.6) continue
+    const brightness = (wave - 0.6) / 0.4 // 0→1 over the peak
+    const alpha = s.peakOpacity * brightness
+
+    ctx.globalAlpha = alpha
+    ctx.fillStyle = '#FFFFFF'
+    ctx.beginPath()
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2)
     ctx.fill()
   }
 }
@@ -201,7 +256,7 @@ function createShimmerBlob(w, h) {
   // Spawn along the mid-dune horizon zone
   return {
     x: Math.random() * w,
-    y: h * 0.55 + Math.random() * h * 0.2,
+    y: h * 0.4 + Math.random() * h * 0.35,
     size: 30 + Math.random() * 50,
     opacity: 0.015 + Math.random() * 0.015,
     riseSpeed: 0.08 + Math.random() * 0.12,
@@ -218,7 +273,7 @@ function animateShimmer(ctx, particles, w, h, time) {
     p.x += Math.sin(time * p.wobbleFreq + p.phase) * p.wobbleAmp * 0.02
 
     // Reset when risen too high
-    if (p.y < h * 0.3) Object.assign(p, createShimmerBlob(w, h))
+    if (p.y < h * 0.15) Object.assign(p, createShimmerBlob(w, h))
 
     const pulse = 0.6 + 0.4 * Math.sin(time * p.pulseFreq + p.phase)
 
@@ -239,8 +294,8 @@ const SAND = {
 
 const SAND_COUNTS = {
   streaks:   { desktop: 600, mobile: 150 },
-  grains:    { desktop: 1000, mobile: 250 },
-  dustMotes: { desktop: 400, mobile: 80 },
+  grains:    { desktop: 2000, mobile: 350 },
+  dustMotes: { desktop: 550, mobile: 110 },
 }
 
 function pickColor(arr) { return arr[Math.floor(Math.random() * arr.length)] }
@@ -316,8 +371,8 @@ function createStreak(w, h, scattered) {
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    length: (5 + Math.random() * 8) + depth * 6,
-    thickness: (0.4 + Math.random() * 0.5) + depth * 0.5,
+    length: (2 + Math.random() * 4) + depth * 3,
+    thickness: (0.2 + Math.random() * 0.3) + depth * 0.3,
     color: pickColor(SAND.colors),
     opacity: (0.3 + Math.random() * 0.2) + depth * 0.3,
     windSpeed: (0.6 + Math.random() * 0.8) + depth * (0.8 + Math.random() * 1.0),
@@ -342,7 +397,7 @@ function createGrain(w, h, scattered) {
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    size: (0.6 + Math.random() * 1.0) + depth * 1.2,
+    size: (0.5 + Math.random() * 0.5) + depth * 0.5,
     color: pickColor(SAND.colors),
     opacity: (0.3 + Math.random() * 0.25) + depth * 0.3,
     windSpeed: (0.25 + Math.random() * 0.4) + depth * (0.4 + Math.random() * 0.6),
@@ -361,7 +416,7 @@ function createGrain(w, h, scattered) {
 function createDustMote(w, h, scattered) {
   const { x, y, dune } = randomCrestPoint(w, h)
   const travelX = scattered ? Math.random() * w * 0.5 : 0
-  const travelY = scattered ? -(Math.random() * 120) : 0
+  const travelY = scattered ? -(Math.random() * h * 0.35) : 0
   const depth = dune / (DUNE_CRESTS.length - 1)
   return {
     kind: 'dust',
@@ -369,17 +424,17 @@ function createDustMote(w, h, scattered) {
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    size: (0.8 + Math.random() * 1.2) + depth * 1.0,
+    size: (0.3 + Math.random() * 0.5) + depth * 0.4,
     color: pickColor(SAND.dustColors),
     opacity: (0.08 + Math.random() * 0.12) + depth * 0.15,
     windSpeed: (0.04 + Math.random() * 0.08) + depth * (0.06 + Math.random() * 0.1),
-    lift: -((0.03 + Math.random() * 0.08) + depth * 0.1),
+    lift: -((0.06 + Math.random() * 0.14) + depth * 0.18),
     wobbleAmp: 0.5 + Math.random() * 1.0,
     wobbleFreq: 0.5 + Math.random() * 1.0,
     phase: Math.random() * Math.PI * 2,
     pulseFreq: 0.3 + Math.random() * 0.5,
     life: scattered ? Math.random() : 1,
-    decay: 0.001 + Math.random() * 0.002,
+    decay: 0.0006 + Math.random() * 0.0012,
   }
 }
 
@@ -415,8 +470,8 @@ function updateWindGrid(w, h, time) {
 
   // Large-scale prevailing wind (slowly shifts direction)
   const prevailAngle = noise3D(0, 0, time * 0.02) * 0.3 // ±0.3 rad from east
-  const prevailX = Math.cos(prevailAngle) * 1.8
-  const prevailY = Math.sin(prevailAngle) * 0.4
+  const prevailX = Math.cos(prevailAngle) * 1.0
+  const prevailY = Math.sin(prevailAngle) * 0.25
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -435,8 +490,8 @@ function sampleWind(x, y, time) {
   if (useMobileWind) {
     // Cheap sine-based wind — no grid, no noise lookups
     return {
-      wx: 1.5 + Math.sin(time * 0.3 + y * 0.01) * 0.8,
-      wy: Math.sin(time * 0.5 + x * 0.008) * 0.25,
+      wx: 0.8 + Math.sin(time * 0.3 + y * 0.01) * 0.5,
+      wy: Math.sin(time * 0.5 + x * 0.008) * 0.15,
     }
   }
   const c = (x / GRID_CELL) | 0
@@ -548,6 +603,90 @@ function animateSand(ctx, particles, w, h, time) {
   }
 }
 
+/* ── Wind swooshes — hand-drawn style curved strokes ── */
+
+const SWOOSH_COUNTS = { desktop: 12, mobile: 5 }
+
+function createSwoosh(w, h) {
+  const y = h * 0.15 + Math.random() * h * 0.5
+  return {
+    x: -(Math.random() * w * 0.3),
+    y,
+    // Control point offsets for the bezier curve
+    length: 120 + Math.random() * 200,
+    curve: (Math.random() - 0.5) * 50,
+    thickness: 0.8 + Math.random() * 1.2,
+    speed: 0.5 + Math.random() * 0.7,
+    opacity: 0.10 + Math.random() * 0.10,
+    life: 0,
+    growSpeed: 0.008 + Math.random() * 0.006,
+    phase: Math.random() * Math.PI * 2,
+    wobbleAmp: 0.3 + Math.random() * 0.5,
+    wobbleFreq: 1.5 + Math.random() * 1.5,
+    taper: 0.5 + Math.random() * 0.5,
+  }
+}
+
+function animateSwooshes(ctx, swooshes, w, h, time) {
+  for (const s of swooshes) {
+    const wobble = Math.sin(time * s.wobbleFreq + s.phase) * s.wobbleAmp
+    s.x += s.speed
+    s.y += wobble * 0.3
+    s.life = Math.min(1, s.life + s.growSpeed)
+
+    // Reset when offscreen or fully faded
+    if (s.x > w + s.length || s.life <= 0) {
+      Object.assign(s, createSwoosh(w, h))
+      continue
+    }
+
+    // Draw progress — stroke reveals left to right
+    const progress = s.life
+    const drawLen = s.length * progress
+
+    // Bezier control points
+    const x0 = s.x
+    const y0 = s.y
+    const x3 = s.x + drawLen
+    const y3 = s.y + s.curve * progress + wobble * 8
+    const cx1 = x0 + drawLen * 0.33
+    const cy1 = y0 + s.curve * 0.6
+    const cx2 = x0 + drawLen * 0.66
+    const cy2 = y3 - s.curve * 0.3
+
+    // Draw as a series of segments for tapered thickness
+    const segments = 12
+    const pts = []
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments
+      const u = 1 - t
+      const px = u*u*u*x0 + 3*u*u*t*cx1 + 3*u*t*t*cx2 + t*t*t*x3
+      const py = u*u*u*y0 + 3*u*u*t*cy1 + 3*u*t*t*cy2 + t*t*t*y3
+      pts.push({ x: px, y: py, t })
+    }
+
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i]
+      const b = pts[i + 1]
+      // Taper: thick in the middle, thin at ends
+      const mid = 1 - Math.abs(a.t - 0.4) * 2
+      const taper = Math.max(0.1, mid) * s.taper
+      const lineW = s.thickness * (1 + taper * 1.5)
+
+      // Fade at ends
+      const edgeFade = Math.min(a.t * 5, (1 - a.t) * 3, 1)
+      ctx.globalAlpha = s.opacity * edgeFade * progress
+      ctx.strokeStyle = '#D8C8A0'
+      ctx.lineWidth = lineW
+      ctx.lineCap = 'round'
+      ctx.beginPath()
+      ctx.moveTo(a.x, a.y)
+      ctx.lineTo(b.x, b.y)
+      ctx.stroke()
+    }
+  }
+}
+
 /* ── Ground streams — dense sand fog hugging the bottom ── */
 
 const STREAM_COUNTS = { desktop: 300, mobile: 70 }
@@ -560,8 +699,8 @@ function createStreamParticle(w, h, scattered) {
   return {
     x: scattered ? Math.random() * w : -(Math.random() * w * 0.3),
     y: floor + depthBias * (h - floor),
-    size: 0.3 + Math.random() * 0.9,
-    length: 3 + Math.random() * 8,
+    size: 0.15 + Math.random() * 0.4,
+    length: 1.5 + Math.random() * 4,
     color: pickColor(SAND.colors),
     opacity: 0.18 + Math.random() * 0.3,
     speed: 0.6 + Math.random() * 0.9,
@@ -727,6 +866,14 @@ export default function ParticleSystem({ theme = 'sand', activeRef }) {
       ? Array.from({ length: SHIMMER_COUNT[devKey] }, () => createShimmerBlob(w, h))
       : null
 
+    let swooshes = theme === 'sand'
+      ? Array.from({ length: SWOOSH_COUNTS[devKey] }, () => createSwoosh(w, h))
+      : null
+
+    let bankSparkles = theme === 'snow'
+      ? createBankSparkles(w, h, isMobile)
+      : null
+
     function rebuildParticles() {
       items = theme === 'snow'
         ? Array.from({ length: isMobile ? SNOW.mobileCount : SNOW.count }, () => createSnowflake(w, h, true))
@@ -738,6 +885,12 @@ export default function ParticleSystem({ theme = 'sand', activeRef }) {
         : Array.from({ length: SAND_BOKEH_COUNT[key] }, () => createSandBokeh(w, h, true))
       shimmer = theme === 'sand'
         ? Array.from({ length: SHIMMER_COUNT[key] }, () => createShimmerBlob(w, h))
+        : null
+      swooshes = theme === 'sand'
+        ? Array.from({ length: SWOOSH_COUNTS[key] }, () => createSwoosh(w, h))
+        : null
+      bankSparkles = theme === 'snow'
+        ? createBankSparkles(w, h, isMobile)
         : null
     }
 
@@ -802,9 +955,11 @@ export default function ParticleSystem({ theme = 'sand', activeRef }) {
 
       if (theme === 'snow') {
         animateSnow(ctx, items, w, h, time)
+        if (bankSparkles) animateBankSparkles(ctx, bankSparkles, time)
         if (bokeh) animateBokeh(ctx, bokeh, w, h, time)
       } else {
         if (shimmer) animateShimmer(ctx, shimmer, w, h, time)
+        if (swooshes) animateSwooshes(ctx, swooshes, w, h, time)
         animateSand(ctx, items, w, h, time)
         if (streams) animateStreams(ctx, streams, w, h, time)
         if (bokeh) animateSandBokeh(ctx, bokeh, w, h, time)

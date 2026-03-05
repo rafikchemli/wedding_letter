@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, MotionConfig } from 'framer-motion'
 import { FileText, ChevronDown } from 'lucide-react'
 import '@theme-toggles/react/css/Simple.css'
@@ -263,11 +263,15 @@ function App() {
       const saved = localStorage.getItem('wedding-theme')
       if (saved) {
         document.documentElement.setAttribute('data-theme', saved)
+        const fi = document.querySelector('link[type="image/svg+xml"]')
+        if (fi) fi.href = saved === 'snow' ? '/favicon-dark.svg' : '/favicon.svg'
         return saved
       }
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const initial = prefersDark ? 'snow' : 'sand'
       document.documentElement.setAttribute('data-theme', initial)
+      const fi = document.querySelector('link[type="image/svg+xml"]')
+      if (fi) fi.href = initial === 'snow' ? '/favicon-dark.svg' : '/favicon.svg'
       return initial
     } catch { return 'sand' }
   })
@@ -311,9 +315,20 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const scrollToForm = () => {
+  const scrollToForm = useCallback(() => {
     document.getElementById('form-section')?.scrollIntoView({ behavior: 'smooth' })
-  }
+  }, [])
+
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === 'ArrowDown' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+        e.preventDefault()
+        scrollToForm()
+      }
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [scrollToForm])
 
   const t = THEMES[theme]
 

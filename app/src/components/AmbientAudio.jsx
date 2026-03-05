@@ -241,6 +241,18 @@ export default function AmbientAudio({ theme = 'sand' }) {
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [playing])
 
+  /* ── Keyboard shortcut: M to mute/unmute ── */
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === 'm' || e.key === 'M') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return
+        toggle()
+      }
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [toggle])
+
   /* ── Cleanup ── */
   useEffect(() => {
     return () => {
