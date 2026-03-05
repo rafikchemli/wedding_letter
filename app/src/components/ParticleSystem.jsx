@@ -11,19 +11,36 @@ const SNOW = {
   opacityRange: [0.4, 0.85],
 }
 
+// Snow terrain through-points [svgX, svgY] — from GROUND_PATHS.snow cubic beziers
+// Small/far flakes stop at far layers, large/close flakes reach the front drift
+const SNOW_CRESTS = [
+  // Far distant snowbank
+  [[-50,680], [400,620], [720,630], [1080,590], [1250,610]],
+  // Back snowbank
+  [[-50,700], [220,610], [440,600], [660,620], [900,580], [1100,620], [1250,590]],
+  // Mid snowbank
+  [[-50,740], [200,680], [430,670], [680,680], [920,665], [1150,685], [1250,675]],
+  // Front drift
+  [[-50,760], [380,735], [700,738], [1050,732], [1250,735]],
+]
+
 function createSnowflake(w, h, scattered) {
   const size = SNOW.sizeRange[0] + Math.random() * (SNOW.sizeRange[1] - SNOW.sizeRange[0])
+  // Depth layer: small flakes stop at far terrain, large at front
+  const depth = (size - SNOW.sizeRange[0]) / (SNOW.sizeRange[1] - SNOW.sizeRange[0])
   return {
     x: scattered ? Math.random() * w : Math.random() * w * 1.5 - w * 0.25,
     y: scattered ? Math.random() * h : -(Math.random() * h * 0.2 + size),
     size,
+    depthLayer: Math.min(3, Math.floor(depth * 4)),
     color: SNOW.colors[Math.floor(Math.random() * SNOW.colors.length)],
     opacity: SNOW.opacityRange[0] + Math.random() * (SNOW.opacityRange[1] - SNOW.opacityRange[0]),
-    // Each flake has its own fall speed + slight horizontal drift
-    fallSpeed: 1.2 + Math.random() * 2.0,
-    drift: 0.3 + Math.random() * 0.8, // consistent rightward angle
+    // Depth-scaled speed: close/big flakes fall faster, far/small ones drift gently
+    // depth 0 → slow (0.6–1.2), depth 1 → fast (1.8–3.6)
+    fallSpeed: (0.6 + Math.random() * 0.6) + depth * (1.2 + Math.random() * 1.8),
+    drift: (0.15 + Math.random() * 0.25) + depth * (0.3 + Math.random() * 0.6),
     // Small wobble — NOT floaty, just a slight jitter
-    wobbleAmp: 0.2 + Math.random() * 0.5,
+    wobbleAmp: 0.15 + Math.random() * 0.3 + depth * 0.3,
     wobbleFreq: 2 + Math.random() * 3,
     phase: Math.random() * Math.PI * 2,
   }
@@ -41,22 +58,29 @@ function animateSnow(ctx, particles, w, h, time) {
     p.y += p.fallSpeed
     p.x += p.drift + wobble + gust * (0.5 / p.size)
 
-    // Recycle
-    if (p.y > h + p.size) {
+    // Terrain occlusion — flake disappears behind its depth-matched snowbank
+    const terrainY = sampleTerrainY(p.depthLayer, p.x, w, h)
+    if (p.y >= terrainY || p.y > h + p.size) {
       Object.assign(p, createSnowflake(w, h, false))
+      continue
     }
     if (p.x > w + p.size * 2) p.x = -p.size * 2
     if (p.x < -p.size * 2) p.x = w + p.size * 2
 
+    // Fade out as flake approaches its terrain line
+    const fadeZone = 25
+    const distToTerrain = terrainY - p.y
+    const terrainFade = distToTerrain < fadeZone ? distToTerrain / fadeZone : 1
+
     // Draw — simple circle
-    ctx.globalAlpha = p.opacity
+    ctx.globalAlpha = p.opacity * terrainFade
     ctx.fillStyle = p.color
     ctx.beginPath()
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
     ctx.fill()
 
     // Subtle highlight
-    ctx.globalAlpha = p.opacity * 0.3
+    ctx.globalAlpha = p.opacity * terrainFade * 0.3
     ctx.fillStyle = '#FFFFFF'
     ctx.beginPath()
     ctx.arc(p.x - p.size * 0.2, p.y - p.size * 0.2, p.size * 0.35, 0, Math.PI * 2)
@@ -72,9 +96,9 @@ const SAND = {
 }
 
 const SAND_COUNTS = {
-  streaks:   { desktop: 600, mobile: 250 },
-  grains:    { desktop: 1000, mobile: 400 },
-  dustMotes: { desktop: 400, mobile: 150 },
+  streaks:   { desktop: 600, mobile: 150 },
+  grains:    { desktop: 1000, mobile: 250 },
+  dustMotes: { desktop: 400, mobile: 80 },
 }
 
 function pickColor(arr) { return arr[Math.floor(Math.random() * arr.length)] }
@@ -104,6 +128,21 @@ function svgToScreen(svgX, svgY, w, h) {
   return { x: svgX * scale + ox, y: svgY * scale + oy }
 }
 
+// Sample snow terrain Y at a screen X for a given crest layer
+function sampleTerrainY(crestIdx, screenX, w, h) {
+  const crest = SNOW_CRESTS[crestIdx]
+  const pts = crest.map(([sx, sy]) => svgToScreen(sx, sy, w, h))
+  if (screenX <= pts[0].x) return pts[0].y
+  if (screenX >= pts[pts.length - 1].x) return pts[pts.length - 1].y
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (screenX <= pts[i + 1].x) {
+      const t = (screenX - pts[i].x) / (pts[i + 1].x - pts[i].x)
+      return pts[i].y + t * (pts[i + 1].y - pts[i].y)
+    }
+  }
+  return pts[pts.length - 1].y
+}
+
 // Linearly interpolate along a crest polyline at parameter t ∈ [0,1]
 function sampleCrest(crest, t, w, h) {
   const n = crest.length - 1
@@ -127,17 +166,19 @@ function createStreak(w, h, scattered) {
   // If scattered (init), spread along the travel path; otherwise start at crest
   const travelX = scattered ? Math.random() * w * 0.4 : 0
   const travelY = scattered ? -(Math.random() * 30) : 0
+  // Depth: 0=back(far) → 1=front(close) — closer dunes move faster
+  const depth = dune / (DUNE_CRESTS.length - 1)
   return {
     kind: 'streak',
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    length: 5 + Math.random() * 12,
-    thickness: 0.5 + Math.random() * 0.8,
+    length: (5 + Math.random() * 8) + depth * 6,
+    thickness: (0.4 + Math.random() * 0.5) + depth * 0.5,
     color: pickColor(SAND.colors),
-    opacity: 0.45 + Math.random() * 0.4,
-    windSpeed: 1.0 + Math.random() * 1.5,
-    drift: -(0.15 + Math.random() * 0.4), // blow upward off crest
+    opacity: (0.3 + Math.random() * 0.2) + depth * 0.3,
+    windSpeed: (0.6 + Math.random() * 0.8) + depth * (0.8 + Math.random() * 1.0),
+    drift: -((0.1 + Math.random() * 0.2) + depth * 0.3),
     wobbleAmp: 0.15 + Math.random() * 0.3,
     wobbleFreq: 1.5 + Math.random() * 2,
     phase: Math.random() * Math.PI * 2,
@@ -151,18 +192,19 @@ function createGrain(w, h, scattered) {
   const { x, y, dune } = randomCrestPoint(w, h)
   const travelX = scattered ? Math.random() * w * 0.3 : 0
   const travelY = scattered ? -(Math.random() * 60) + Math.random() * 30 : 0
+  const depth = dune / (DUNE_CRESTS.length - 1)
   return {
     kind: 'grain',
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    size: 0.8 + Math.random() * 2.0,
+    size: (0.6 + Math.random() * 1.0) + depth * 1.2,
     color: pickColor(SAND.colors),
-    opacity: 0.4 + Math.random() * 0.45,
-    windSpeed: 0.4 + Math.random() * 0.8,
-    lift: -(0.2 + Math.random() * 0.5),  // initial upward velocity
-    fall: 0.008 + Math.random() * 0.015,   // gravity pulls back
-    vy: scattered ? (Math.random() - 0.5) * 0.25 : -(0.2 + Math.random() * 0.5),
+    opacity: (0.3 + Math.random() * 0.25) + depth * 0.3,
+    windSpeed: (0.25 + Math.random() * 0.4) + depth * (0.4 + Math.random() * 0.6),
+    lift: -((0.15 + Math.random() * 0.3) + depth * 0.3),
+    fall: 0.008 + Math.random() * 0.015,
+    vy: scattered ? (Math.random() - 0.5) * 0.25 : -((0.15 + Math.random() * 0.3) + depth * 0.3),
     wobbleAmp: 0.3 + Math.random() * 0.6,
     wobbleFreq: 2 + Math.random() * 3,
     phase: Math.random() * Math.PI * 2,
@@ -173,19 +215,20 @@ function createGrain(w, h, scattered) {
 
 // Dust motes — tiny particles that rise high off the crests
 function createDustMote(w, h, scattered) {
-  const { x, y } = randomCrestPoint(w, h)
+  const { x, y, dune } = randomCrestPoint(w, h)
   const travelX = scattered ? Math.random() * w * 0.5 : 0
   const travelY = scattered ? -(Math.random() * 120) : 0
+  const depth = dune / (DUNE_CRESTS.length - 1)
   return {
     kind: 'dust',
     x: x + travelX,
     y: y + travelY,
     spawnY: y,
-    size: 1.0 + Math.random() * 2.0,
+    size: (0.8 + Math.random() * 1.2) + depth * 1.0,
     color: pickColor(SAND.dustColors),
-    opacity: 0.12 + Math.random() * 0.22,
-    windSpeed: 0.06 + Math.random() * 0.15,
-    lift: -(0.05 + Math.random() * 0.15),
+    opacity: (0.08 + Math.random() * 0.12) + depth * 0.15,
+    windSpeed: (0.04 + Math.random() * 0.08) + depth * (0.06 + Math.random() * 0.1),
+    lift: -((0.03 + Math.random() * 0.08) + depth * 0.1),
     wobbleAmp: 0.5 + Math.random() * 1.0,
     wobbleFreq: 0.5 + Math.random() * 1.0,
     phase: Math.random() * Math.PI * 2,
@@ -204,7 +247,10 @@ function createSandParticles(w, h, isMobile) {
   ]
 }
 
-/* ── Simplex noise wind field ── */
+/* ── Wind field ── */
+
+// Mobile uses cheap sine wind; desktop uses full simplex noise grid
+let useMobileWind = false
 
 const GRID_CELL = 40 // px per grid cell
 const noise3D = createNoise3D()
@@ -240,7 +286,14 @@ function updateWindGrid(w, h, time) {
   }
 }
 
-function sampleWind(x, y) {
+function sampleWind(x, y, time) {
+  if (useMobileWind) {
+    // Cheap sine-based wind — no grid, no noise lookups
+    return {
+      wx: 1.5 + Math.sin(time * 0.3 + y * 0.01) * 0.8,
+      wy: Math.sin(time * 0.5 + x * 0.008) * 0.25,
+    }
+  }
   const c = (x / GRID_CELL) | 0
   const r = (y / GRID_CELL) | 0
   const cc = Math.min(c, windGrid.cols - 1)
@@ -250,11 +303,11 @@ function sampleWind(x, y) {
 }
 
 function animateSand(ctx, particles, w, h, time) {
-  // Update wind field once per frame
-  updateWindGrid(w, h, time)
+  // Update wind field once per frame (desktop only — mobile uses sine wind)
+  if (!useMobileWind) updateWindGrid(w, h, time)
 
   for (const p of particles) {
-    const { wx, wy } = sampleWind(p.x, p.y)
+    const { wx, wy } = sampleWind(p.x, p.y, time)
     const wobble = Math.sin(time * p.wobbleFreq + p.phase) * p.wobbleAmp
 
     // Life fades — respawn at crest when dead or offscreen
@@ -339,7 +392,7 @@ function animateSand(ctx, particles, w, h, time) {
 
 /* ── Ground streams — dense sand fog hugging the bottom ── */
 
-const STREAM_COUNTS = { desktop: 300, mobile: 120 }
+const STREAM_COUNTS = { desktop: 300, mobile: 70 }
 
 function createStreamParticle(w, h, scattered) {
   // Spawn from the front dune crest, hugging it closely
@@ -372,7 +425,7 @@ function animateStreams(ctx, particles, w, h, time) {
   const floor = crestY - 5
 
   for (const p of particles) {
-    const { wx, wy } = sampleWind(p.x, p.y)
+    const { wx, wy } = sampleWind(p.x, p.y, time)
     const wobble = Math.sin(time * p.wobbleFreq + p.phase) * p.wobbleAmp
 
     // Fast horizontal, very slight vertical undulation
@@ -454,7 +507,7 @@ function animateTrail(ctx, trail) {
 
 /* ── Main component ── */
 
-export default function ParticleSystem({ theme = 'sand' }) {
+export default function ParticleSystem({ theme = 'sand', activeRef }) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -462,15 +515,18 @@ export default function ParticleSystem({ theme = 'sand' }) {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    let isMobile = window.innerWidth < 640
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2)
     let running = true
     let raf = null
     let lastTime = performance.now()
 
-    let isMobile = window.innerWidth < 640
+    // Enable mobile wind optimization
+    useMobileWind = isMobile
     let w = window.innerWidth
     let h = window.innerHeight
 
+    let resizeTimer = null
     const resize = () => {
       canvas.width = window.innerWidth * dpr
       canvas.height = window.innerHeight * dpr
@@ -485,7 +541,10 @@ export default function ParticleSystem({ theme = 'sand' }) {
         w = newW
         h = newH
         isMobile = newMobile
-        rebuildParticles()
+        useMobileWind = isMobile
+        // Debounce expensive particle rebuild — canvas resizes immediately
+        clearTimeout(resizeTimer)
+        resizeTimer = setTimeout(rebuildParticles, 200)
       } else {
         w = newW
         h = newH
@@ -530,11 +589,38 @@ export default function ParticleSystem({ theme = 'sand' }) {
 
     let time = 0
 
+    // FPS ratchet — track rolling average, halve particles if consistently low
+    const FPS_WINDOW = 30
+    const frameDeltas = []
+    let ratcheted = false
+
     const animate = (now) => {
       if (!running) return
+
+      // Pause when hero is offscreen
+      if (activeRef && !activeRef.current) {
+        lastTime = now // prevent time jump on resume
+        raf = requestAnimationFrame(animate)
+        return
+      }
+
       const dt = Math.min((now - lastTime) / 1000, 0.05)
       lastTime = now
       time += dt
+
+      // FPS ratchet — halve particles if avg drops below 24fps for 1 second
+      if (!ratcheted) {
+        frameDeltas.push(dt)
+        if (frameDeltas.length > FPS_WINDOW) frameDeltas.shift()
+        if (frameDeltas.length === FPS_WINDOW) {
+          const avgDt = frameDeltas.reduce((a, b) => a + b, 0) / FPS_WINDOW
+          if (avgDt > 1 / 24) {
+            ratcheted = true
+            items = items.filter((_, i) => i % 2 === 0)
+            if (streams) streams = streams.filter((_, i) => i % 2 === 0)
+          }
+        }
+      }
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, w, h)
@@ -543,11 +629,9 @@ export default function ParticleSystem({ theme = 'sand' }) {
         animateSnow(ctx, items, w, h, time)
       } else {
         animateSand(ctx, items, w, h, time)
-        // Ground streams on top of particles — sand fog at the floor
         if (streams) animateStreams(ctx, streams, w, h, time)
       }
 
-      // Draw cursor trail on top
       if (trail.length > 0) {
         animateTrail(ctx, trail)
       }
@@ -575,6 +659,7 @@ export default function ParticleSystem({ theme = 'sand' }) {
     return () => {
       running = false
       if (raf) cancelAnimationFrame(raf)
+      clearTimeout(resizeTimer)
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('visibilitychange', onVisibility)

@@ -110,7 +110,7 @@ const mockForm = {
   returnReason: 'Emploi permanent à Alger',
   passportNumber: 'DZ1234567',
   issuingCountry: 'Algérie',
-  relationship: 'Ami d\'enfance',
+  relationship: 'mon ami d\'enfance|my childhood friend',
 }
 
 const isDev = import.meta.env.DEV
@@ -382,12 +382,16 @@ export default function InvitationForm({ onSubmit, initialData }) {
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A6B55' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
           >
             <option value="" disabled>Choisir le lien...</option>
-            <option value="Ami d'enfance">Ami d'enfance</option>
-            <option value="Ami proche">Ami proche</option>
-            <option value="Cousin / Cousine">Cousin / Cousine</option>
-            <option value="Oncle / Tante">Oncle / Tante</option>
-            <option value="Collègue">Collègue</option>
-            <option value="Autre membre de la famille">Autre membre de la famille</option>
+            <option value="mon ami d'enfance|my childhood friend">Ami d'enfance</option>
+            <option value="mon ami proche|my close friend">Ami proche</option>
+            <option value="mon cousin|my cousin">Cousin</option>
+            <option value="ma cousine|my cousin">Cousine</option>
+            <option value="mon frère|my brother">Frère</option>
+            <option value="ma sœur|my sister">Sœur</option>
+            <option value="mon oncle|my uncle">Oncle</option>
+            <option value="ma tante|my aunt">Tante</option>
+            <option value="mon collègue|my colleague">Collègue</option>
+            <option value="un membre de ma famille|a member of my family">Autre membre de la famille</option>
           </select>
         </Field>
       </Section>

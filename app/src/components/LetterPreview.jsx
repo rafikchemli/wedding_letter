@@ -10,42 +10,54 @@ import OrnamentalDivider from './OrnamentalDivider'
 /* ── Helpers ── */
 
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
+const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 function formatDateFr(isoOrDate) {
   const d = typeof isoOrDate === 'string' ? new Date(isoOrDate + 'T00:00:00') : isoOrDate
   return `${d.getDate()} ${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}`
 }
 
+function formatDateEn(isoOrDate) {
+  const d = typeof isoOrDate === 'string' ? new Date(isoOrDate + 'T00:00:00') : isoOrDate
+  return `${MONTHS_EN[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+}
+
 function letterData(d) {
   const passportLine = d.passportNumber
     ? `, passeport n\u00B0\u00A0${d.passportNumber} (délivré par ${d.issuingCountry || '—'})`
+    : ''
+  const passportLineEn = d.passportNumber
+    ? `, holding passport no.\u00A0${d.passportNumber} (issued by ${d.issuingCountry || '—'})`
     : ''
   const accomDates =
     d.accommodationDatesStart && d.accommodationDatesEnd
       ? ` (ou du ${formatDateFr(d.accommodationDatesStart)} au ${formatDateFr(d.accommodationDatesEnd)} si différent)`
       : ''
-  return { ...d, passportLine, accomDates, today: formatDateFr(new Date()) }
+  // relationship value is "fr label|en label" — split for each language
+  const [relationshipFr, relationshipEn] = (d.relationship || '').split('|')
+  return { ...d, passportLine, passportLineEn, accomDates, relationshipFr: relationshipFr || d.relationship, relationshipEn: relationshipEn || relationshipFr || d.relationship, today: formatDateFr(new Date()), todayEn: formatDateEn(new Date()) }
 }
 
 /* ── DOCX — Government of Canada official letter format ── */
 
 const FONT = 'Times New Roman'
-const BODY = 22  // 11pt in half-points
-const SMALL = 20 // 10pt
-const HEADER_NAME = 26 // 13pt
-const GAP = 200  // ~10pt gap between sections
-const TIGHT = 40 // ~2pt within sections
+const SZ = 22      // 11pt in half-points (matches reference DOCX)
+const SZ_NAME = 26 // 13pt for sender name
+const LINE = 240   // single line spacing
 
 function p(runs, opts = {}) {
+  const { after = 80, before = 0, indent, justify, ...rest } = opts
   return new Paragraph({
     children: Array.isArray(runs) ? runs : [runs],
-    spacing: { after: opts.after ?? GAP, before: opts.before ?? 0, line: 264 },
-    ...opts,
+    spacing: { after, before, line: LINE },
+    ...(justify ? { alignment: 'both' } : {}),
+    ...(indent ? { indent: { left: indent } } : {}),
+    ...rest,
   })
 }
 
 function t(text, opts = {}) {
-  return new TextRun({ text, font: FONT, size: opts.size ?? BODY, ...opts })
+  return new TextRun({ text, font: FONT, size: opts.size ?? SZ, ...opts })
 }
 
 function bold(text, opts = {}) {
@@ -57,96 +69,102 @@ async function generateDocxBlob(d) {
 
   const children = [
     // Sender header
-    p([bold('MADJDI RAFIK CHEMLI', { size: HEADER_NAME })], { after: TIGHT }),
-    p([t('308-267 Rachel Est, Montréal (QC), Canada H2W 1E5', { size: SMALL })], { after: TIGHT }),
-    p([t('Tél. : 514-839-7573 — Courriel : rafik.madjdi.chemli@gmail.com', { size: SMALL })], { after: TIGHT }),
-    new Paragraph({ thematicBreak: true, spacing: { after: GAP } }),
+    p([bold('MADJDI RAFIK CHEMLI', { size: SZ_NAME })], { after: 0 }),
+    p([t('308-267 Rachel Est')], { after: 0 }),
+    p([t('Montréal (QC), Canada H2W 1E5')], { after: 0 }),
+    p([t('Tél. : 514-793-1185')], { after: 0 }),
+    p([t('Courriel : rafik.madjdi.chemli@gmail.com')], { after: 200 }),
+    p([t(`Date : ${L.today}`)], { after: 120 }),
 
-    // Date
-    p([t(`Le ${L.today}`)], { after: GAP }),
-
-    // Addressee
-    p([t('Immigration, Réfugiés et Citoyenneté Canada (IRCC)')], { after: GAP }),
-
-    // Subject — bold
-    p([bold(`Objet : Lettre d'invitation — Visa visiteur pour ${L.fullName}`)], { after: GAP }),
+    // Addressee + Subject
+    p([bold('À : '), t('Immigration, Réfugiés et Citoyenneté Canada (IRCC)')], { after: 0 }),
+    p([bold('Objet : '), t(`Lettre d'invitation pour visa visiteur — ${L.fullName}`)], { after: 240 }),
 
     // Salutation
-    p([t('Madame, Monsieur,')], { after: GAP }),
+    p([t('Madame, Monsieur,')], { after: 100 }),
 
-    // Body
+    // §1 — Who I am + who I invite
     p([
-      t('Je soussigné '), bold('Madjdi Rafik Chemli'),
-      t(', né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l\'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente '),
+      t('Je soussigné, '), bold('Madjdi Rafik Chemli'),
+      t(`, invite ${L.relationshipFr}, `),
       bold(L.fullName),
-      t(`, né(e) le ${L.dob}, de nationalité ${L.nationality}, résidant au ${L.address}, téléphone ${L.phone}, courriel ${L.email}${L.passportLine}, à venir au Canada pour un séjour temporaire.`),
-    ]),
+      t(`, né(e) le `), bold(formatDateFr(L.dob)),
+      t(`${L.passportLine}, résidant au `), bold(L.address),
+      t(', à me rendre visite au Canada.'),
+    ], { justify: true }),
 
+    // §2 — My status in Canada
     p([
-      bold('Motif du voyage : '),
-      t('assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.'),
-    ]),
+      t('Je suis '), bold('citoyen canadien'),
+      t(', résidant à l\'adresse mentionnée ci-dessus. Je suis citoyen canadien depuis 2006 et je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme '),
+      bold('Senior AI Engineer'),
+      t(' chez '),
+      bold('NewMathData'),
+      t(', et je suis financièrement stable.'),
+    ], { justify: true }),
 
+    // §3 — Purpose of the visit
     p([
-      bold('Dates prévues du séjour : '),
-      t(`du ${formatDateFr(L.arrivalDate)} au ${formatDateFr(L.departureDate)} (durée totale : ${L.duration}).`),
-    ]),
+      t('Le but de cette visite est d\''),
+      bold('assister à mon mariage'),
+      t(', prévu le '), bold('19 septembre 2026'),
+      t(' à la salle '), bold('L\'Éloi, Montréal, Québec'),
+      t('. Le séjour est prévu du '),
+      bold(formatDateFr(L.arrivalDate)),
+      t(' au '),
+      bold(formatDateFr(L.departureDate)),
+      t(` (${L.duration}). Durant cette période, ${L.fullName} logera chez moi à mon domicile.`),
+    ], { justify: true }),
 
+    // §4 — Financial support
     p([
-      bold('Hébergement : '),
-      t(`${L.fullName} logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur${L.accomDates}.`),
-    ]),
+      t(`Je confirme que je fournirai l'hébergement pendant le séjour. ${L.fullName} assumera les autres frais liés à son voyage (billet d'avion, transport, nourriture).`),
+    ], { justify: true }),
 
+    // §5 — Ties to home country
     p([
-      bold('Dispositions financières : '),
-      t(`Je prendrai en charge l'hébergement de ${L.fullName} à mon domicile, sans frais pour le visiteur. ${L.fullName} assumera les autres frais liés à son voyage (billet d'avion, transport, nourriture).`),
-    ]),
+      t(`${L.fullName} a des attaches solides dans son pays de résidence (${L.returnCountry}), notamment : `),
+      bold(L.returnReason),
+      t(`. Il/elle retournera en ${L.returnCountry} à la fin de son séjour autorisé.`),
+    ], { justify: true }),
 
+    // §6 — Request
     p([
-      bold('Départ du Canada : '),
-      t(`${L.fullName} quittera le Canada au plus tard le ${formatDateFr(L.departureDate)} afin de retourner en ${L.returnCountry}.`),
-    ]),
+      t('Je vous prie de bien vouloir lui accorder un visa de résident temporaire pour visiter le Canada.'),
+    ], { justify: true }),
 
-    new Paragraph({ thematicBreak: true, spacing: { after: GAP } }),
-
-    // Host info — compact
-    p([bold('Informations de l\'hôte :')], { after: TIGHT }),
-    p([t('Conjointe : Sandrine Martelle, née le 3 février 1995', { size: SMALL })], { after: TIGHT }),
-    p([t(`Lien avec le visiteur : ${L.relationship}`, { size: SMALL })], { after: TIGHT }),
-    p([t(`Poste : Scientifique principal des données (EC-05) — Gouvernement du Canada — Statistique Canada`, { size: SMALL })], { after: GAP }),
-
-    // Confirmation
-    p([t(`Je confirme que les informations ci-dessus sont exactes et fournies à l'appui de la demande de visa visiteur de ${L.fullName}.`)]),
+    // §7 — Contact + Thank you
+    p([
+      t('Si vous avez besoin de renseignements supplémentaires, n\'hésitez pas à me contacter. Je vous remercie de votre considération.'),
+    ], { justify: true }),
 
     // Signature
-    p([t('Cordialement,')], { before: GAP, after: 800 }),
-    p([bold('Madjdi Rafik Chemli')], { after: TIGHT }),
-    p([t('Scientifique principal des données (EC-05)', { size: SMALL })], { after: TIGHT }),
-    p([t('Statistique Canada', { size: SMALL })]),
+    p([t('Cordialement,')], { after: 80 }),
+    p([bold('Madjdi Rafik Chemli')], { after: 0 }),
+    p([t('Senior AI Engineer — NewMathData')], { after: 0 }),
+    p([t('Citoyen canadien')], { after: 200 }),
 
     // Enclosures
-    new Paragraph({ thematicBreak: true, spacing: { before: GAP * 2, after: GAP } }),
-    p([bold('p.j.', { size: SMALL }), t(' (pièces jointes) :', { size: SMALL })], { after: TIGHT }),
-    p([t('– Copie de la carte de citoyenneté canadienne', { size: SMALL })], { after: TIGHT }),
-    p([t('– Preuve d\'emploi', { size: SMALL })], { after: TIGHT }),
-    p([t('– Talon de paie récent', { size: SMALL })], { after: TIGHT }),
-    p([t('– Facture d\'électricité (confirmation de domicile)', { size: SMALL })], { after: TIGHT }),
-    p([t('– Contrat de location de la salle de réception (Studio L\'Éloi, Montréal)', { size: SMALL })]),
+    p([bold('p.j. (pièces jointes) :', { underline: { type: 'single' } })], { after: 40 }),
+    p([t('– Copie de la carte de citoyenneté canadienne')], { after: 20, indent: 360 }),
+    p([t('– Lettre d\'emploi (NewMathData)')], { after: 20, indent: 360 }),
+    p([t('– Facture d\'électricité (confirmation de domicile)')], { after: 20, indent: 360 }),
+    p([t('– Contrat de location de la salle de réception (Studio L\'Éloi, Montréal)')], { after: 0, indent: 360 }),
   ]
 
   const doc = new Document({
     styles: {
       default: {
         document: {
-          run: { font: FONT, size: BODY, color: '1A1A1A' },
-          paragraph: { spacing: { after: GAP, line: 264 } },
+          run: { font: FONT, size: SZ, color: '000000' },
+          paragraph: { spacing: { after: 80, line: LINE } },
         },
       },
     },
     sections: [{
       properties: {
         page: {
-          margin: { top: 1440, bottom: 1440, left: 1800, right: 1440 },
+          margin: { top: 1080, bottom: 720, left: 1200, right: 1200 },
           size: { width: 12240, height: 15840 },
         },
       },
@@ -157,10 +175,120 @@ async function generateDocxBlob(d) {
   return Packer.toBlob(doc)
 }
 
-async function downloadDocx(d) {
+function generateDocxBlobEn(d) {
   const L = letterData(d)
-  const blob = await generateDocxBlob(d)
-  saveAs(blob, `invitation_${L.fullName.replace(/\s+/g, '_')}.docx`)
+
+  const children = [
+    // Sender header
+    p([bold('MADJDI RAFIK CHEMLI', { size: SZ_NAME })], { after: 0 }),
+    p([t('308-267 Rachel Est')], { after: 0 }),
+    p([t('Montréal (QC), Canada H2W 1E5')], { after: 0 }),
+    p([t('Phone: 514-793-1185')], { after: 0 }),
+    p([t('Email: rafik.madjdi.chemli@gmail.com')], { after: 200 }),
+    p([t(`Date: ${L.todayEn}`)], { after: 120 }),
+
+    // Addressee + Subject
+    p([bold('To: '), t('Immigration, Refugees and Citizenship Canada (IRCC)')], { after: 0 }),
+    p([bold('Subject: '), t(`Invitation Letter for Visitor Visa — ${L.fullName}`)], { after: 240 }),
+
+    // Salutation
+    p([t('Dear Sir/Madam,')], { after: 100 }),
+
+    // §1
+    p([
+      t(`I am writing to invite ${L.relationshipEn}, `),
+      bold(L.fullName),
+      t(', born on '), bold(formatDateEn(L.dob)),
+      t(`${L.passportLineEn}, currently residing at `), bold(L.address),
+      t(', to visit me in Canada.'),
+    ], { justify: true }),
+
+    // §2
+    p([
+      t('I am a '), bold('Canadian citizen'),
+      t(', residing at the address mentioned above. I have been a Canadian citizen since 2006 and have been living permanently in Canada since 2014. I am currently employed as a '),
+      bold('Senior AI Engineer'),
+      t(' at '),
+      bold('NewMathData'),
+      t(', and I am financially stable.'),
+    ], { justify: true }),
+
+    // §3
+    p([
+      t('The purpose of this visit is to '),
+      bold('attend my wedding'),
+      t(', scheduled for '), bold('September 19, 2026'),
+      t(' at '), bold('Salle L\'Éloi, Montréal, Québec'),
+      t('. The visit is planned from '),
+      bold(formatDateEn(L.arrivalDate)),
+      t(' to '),
+      bold(formatDateEn(L.departureDate)),
+      t(` (${L.duration}). During this period, ${L.fullName} will stay with me at my home.`),
+    ], { justify: true }),
+
+    // §4
+    p([
+      t(`I confirm that I will provide accommodation during the stay. ${L.fullName} will cover other travel-related expenses (airfare, transportation, food).`),
+    ], { justify: true }),
+
+    // §5
+    p([
+      t(`${L.fullName} has strong ties to their country of residence (${L.returnCountry}), including: `),
+      bold(L.returnReason),
+      t(`. They will return to ${L.returnCountry} at the end of their authorized stay.`),
+    ], { justify: true }),
+
+    // §6
+    p([
+      t('I kindly request that you grant them a Temporary Resident Visa to visit Canada.'),
+    ], { justify: true }),
+
+    // §7 + Thank you
+    p([
+      t('If you require any additional information, please do not hesitate to contact me. Thank you for your consideration.'),
+    ], { justify: true }),
+
+    // Signature
+    p([t('Sincerely,')], { after: 80 }),
+    p([bold('Madjdi Rafik Chemli')], { after: 0 }),
+    p([t('Senior AI Engineer — NewMathData')], { after: 0 }),
+    p([t('Canadian Citizen')], { after: 200 }),
+
+    // Enclosures
+    p([bold('Encl. (enclosed documents):', { underline: { type: 'single' } })], { after: 40 }),
+    p([t('– Copy of Canadian citizenship card')], { after: 20, indent: 360 }),
+    p([t('– Employment letter (NewMathData)')], { after: 20, indent: 360 }),
+    p([t('– Electricity bill (proof of residence)')], { after: 20, indent: 360 }),
+    p([t('– Venue rental contract (Studio L\'Éloi, Montréal)')], { after: 0, indent: 360 }),
+  ]
+
+  const doc = new Document({
+    styles: {
+      default: {
+        document: {
+          run: { font: FONT, size: SZ, color: '000000' },
+          paragraph: { spacing: { after: 80, line: LINE } },
+        },
+      },
+    },
+    sections: [{
+      properties: {
+        page: {
+          margin: { top: 1080, bottom: 720, left: 1200, right: 1200 },
+          size: { width: 12240, height: 15840 },
+        },
+      },
+      children,
+    }],
+  })
+
+  return Packer.toBlob(doc)
+}
+
+async function downloadDocx(d, lang = 'fr') {
+  const L = letterData(d)
+  const blob = lang === 'en' ? await generateDocxBlobEn(d) : await generateDocxBlob(d)
+  saveAs(blob, `invitation_${L.fullName.replace(/\s+/g, '_')}_${lang.toUpperCase()}.docx`)
 }
 
 /* ── Supporting documents ── */
@@ -168,19 +296,22 @@ async function downloadDocx(d) {
 const base = import.meta.env.BASE_URL
 
 const SUPPORTING_DOCS = [
-  { label: 'Carte de citoyenneté canadienne', file: 'citoyennete.pdf' },
-  { label: 'Facture d\'électricité', file: 'facture_hydro.pdf' },
-  { label: 'Contrat de la salle de réception', file: 'contrat_salle.pdf' },
-  // { label: 'Preuve d\'emploi', file: 'preuve_emploi.pdf' },
+  { label: 'Carte de citoyenneté canadienne', file: 'carte_citoyennete_canadienne.pdf' },
+  { label: 'Lettre d\'emploi — NewMathData', file: 'lettre_emploi_NewMathData.pdf' },
+  { label: 'Facture d\'électricité (preuve de domicile)', file: 'facture_electricite_domicile.pdf' },
+  { label: 'Contrat de la salle de réception (Studio L\'Éloi)', file: 'contrat_salle_reception.pdf' },
 ]
 
 async function downloadZip(data) {
   const zip = new JSZip()
 
-  // Generate the DOCX and add it
+  // Generate both FR and EN DOCX
   const L = letterData(data)
-  const docxBlob = await generateDocxBlob(data)
-  zip.file(`invitation_${L.fullName.replace(/\s+/g, '_')}.docx`, docxBlob)
+  const docxBlobFr = await generateDocxBlob(data)
+  const docxBlobEn = await generateDocxBlobEn(data)
+  const slug = L.fullName.replace(/\s+/g, '_')
+  zip.file(`invitation_${slug}_FR.docx`, docxBlobFr)
+  zip.file(`invitation_${slug}_EN.docx`, docxBlobEn)
 
   // Fetch each supporting document
   const results = await Promise.allSettled(
@@ -220,71 +351,62 @@ function StyledLetterPreview({ data }) {
       {/* Sender header */}
       <div className="text-center mb-8">
         <h3 className="font-calligraphy text-3xl text-[var(--text)] mb-2">Madjdi Rafik Chemli</h3>
-        <p className="text-xs text-[var(--text-muted)] tracking-wider uppercase">
-          308-267 Rachel Est, Montréal (QC), Canada H2W 1E5
-        </p>
+        <div className="text-xs text-[var(--text-muted)] tracking-wider uppercase space-y-0.5">
+          <p>308-267 Rachel Est</p>
+          <p>Montréal (QC), Canada H2W 1E5</p>
+          <p>Tél. : 514-793-1185</p>
+          <p>Courriel : rafik.madjdi.chemli@gmail.com</p>
+          <p className="mt-2">{today}</p>
+        </div>
       </div>
 
       <LetterDivider />
 
-      {/* Date & addressee */}
-      <div className="text-sm text-[var(--text-70)] space-y-1 mb-6">
-        <p>Date : {today}</p>
+      {/* Addressee */}
+      <div className="text-sm text-[var(--text-70)] mb-6">
         <p>À : Immigration, Réfugiés et Citoyenneté Canada (IRCC)</p>
       </div>
 
       {/* Subject */}
       <div className="bg-[var(--accent-5)] border-l-3 border-[var(--accent)] rounded-r-lg px-4 py-3 mb-6">
         <p className="font-display text-base font-semibold text-[var(--text)]">
-          Objet : Lettre d'invitation — Demande de visa visiteur pour {d.fullName}
+          Objet : Lettre d'invitation pour visa visiteur — {d.fullName}
         </p>
       </div>
 
       {/* Body paragraphs */}
       <div className="space-y-4 text-sm text-[var(--text)] leading-[1.85]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '15px' }}>
-        <p>
-          Je soussigné Madjdi Rafik Chemli, né le 21 juin 1994 à Alger, Algérie, citoyen canadien depuis l'âge de 11 ans, résidant au 308-267 Rachel Est, Montréal (QC), Canada, invite par la présente <strong className="text-[var(--text)]">{d.fullName}</strong>, né(e) le {formatDateFr(d.dob)}, de nationalité {d.nationality}, résidant au {d.address}, téléphone {d.phone}, courriel {d.email}{passportLine}, à venir au Canada pour un séjour temporaire.
-        </p>
+        <p>Madame, Monsieur,</p>
 
-        <p className="font-medium text-[var(--accent)]">
-          Motif du voyage : assister à mon mariage, prévu le 19 septembre 2026 à Montréal, Québec.
+        <p>
+          Je soussigné, <strong>Madjdi Rafik Chemli</strong>, invite {d.relationship.split('|')[0]}, <strong>{d.fullName}</strong>, né(e) le {formatDateFr(d.dob)}{passportLine}, résidant au {d.address}, à me rendre visite au Canada.
         </p>
 
         <p>
-          Dates prévues du séjour : du <strong>{formatDateFr(d.arrivalDate)}</strong> au <strong>{formatDateFr(d.departureDate)}</strong> (durée totale : {d.duration}).
-        </p>
-        <p>
-          Hébergement : {d.fullName} logera chez moi au 308-267 Rachel Est, Montréal (QC), Canada, sans frais pour le visiteur, pendant la durée du séjour{accomDates}.
+          Je suis <strong>citoyen canadien</strong>, résidant à l'adresse mentionnée ci-dessus. Je suis citoyen canadien depuis 2006 et je réside de façon permanente au Canada depuis 2014. Je suis actuellement employé comme <strong>Senior AI Engineer</strong> chez <strong>NewMathData</strong>, et je suis financièrement stable.
         </p>
 
         <p>
-          Dispositions financières : je prendrai en charge l'hébergement de {d.fullName} à mon domicile, sans frais pour le visiteur. {d.fullName} assumera les autres frais liés à son voyage (billet d'avion, transport, nourriture).
+          Le but de cette visite est d'<strong>assister à mon mariage</strong>, prévu le 19 septembre 2026 à la salle L'Éloi, Montréal, Québec. Le séjour est prévu du <strong>{formatDateFr(d.arrivalDate)}</strong> au <strong>{formatDateFr(d.departureDate)}</strong> ({d.duration}). Durant cette période, {d.fullName} logera chez moi à mon domicile.
         </p>
 
         <p>
-          Départ du Canada : {d.fullName} quittera le Canada au plus tard le {formatDateFr(d.departureDate)} afin de retourner en {d.returnCountry}.
+          Je confirme que je fournirai l'hébergement pendant le séjour. {d.fullName} assumera les autres frais liés à son voyage (billet d'avion, transport, nourriture).
         </p>
-
-        <LetterDivider />
-
-        {/* Host info block */}
-        <div className="bg-[var(--surface-alt)] rounded-xl p-4 border border-[var(--border-20)]">
-          <p className="font-display font-semibold text-[var(--text)] mb-2">Informations de l'hôte :</p>
-          <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-            <span className="text-[var(--text-muted)]">Conjointe</span>
-            <span>Sandrine Martelle, née le 3 février 1995</span>
-            <span className="text-[var(--text-muted)]">Lien</span>
-            <span>{d.relationship}</span>
-            <span className="text-[var(--text-muted)]">Poste</span>
-            <span>Scientifique principal des données (EC-05)</span>
-            <span className="text-[var(--text-muted)]">Employeur</span>
-            <span>Gouvernement du Canada — Statistique Canada</span>
-          </div>
-        </div>
 
         <p>
-          Je confirme que les informations ci-dessus sont exactes et fournies à l'appui de la demande de visa visiteur de {d.fullName}.
+          {d.fullName} a des attaches solides dans son pays de résidence ({d.returnCountry}), notamment : {d.returnReason}. Il/elle retournera en {d.returnCountry} à la fin de son séjour autorisé.
         </p>
+
+        <p>
+          Je vous prie de bien vouloir lui accorder un visa de résident temporaire pour visiter le Canada.
+        </p>
+
+        <p>
+          Si vous avez besoin de renseignements supplémentaires, n'hésitez pas à me contacter.
+        </p>
+
+        <p>Je vous remercie de votre considération.</p>
 
         <LetterDivider />
 
@@ -292,6 +414,8 @@ function StyledLetterPreview({ data }) {
         <div className="pt-2">
           <p className="text-[var(--text-muted)] italic mb-3">Cordialement,</p>
           <p className="font-calligraphy text-2xl text-[var(--text)]">Madjdi Rafik Chemli</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">Senior AI Engineer — NewMathData</p>
+          <p className="text-xs text-[var(--text-muted)]">Citoyen canadien</p>
         </div>
 
         <LetterDivider />
@@ -300,8 +424,7 @@ function StyledLetterPreview({ data }) {
         <div className="text-xs text-[var(--text-muted)]">
           <p className="font-semibold text-[var(--text)] mb-1">p.j. (pièces jointes) :</p>
           <p>– Copie de la carte de citoyenneté canadienne</p>
-          <p>– Preuve d'emploi</p>
-          <p>– Talon de paie récent</p>
+          <p>– Lettre d'emploi (NewMathData)</p>
           <p>– Facture d'électricité (confirmation de domicile)</p>
           <p>– Contrat de location de la salle de réception (Studio L'Éloi, Montréal)</p>
         </div>
@@ -366,7 +489,7 @@ export default function LetterPreview({ data, onBack }) {
         <div>
           <p className="text-sm font-medium text-[var(--text)]">Lettre générée avec succès</p>
           <p className="text-sm text-[var(--accent)] mt-0.5">
-            Vérifiez l'aperçu ci-dessous puis téléchargez en DOCX ou PDF.
+            Vous pouvez modifier le document Word librement avant de le soumettre. N'oubliez pas d'y joindre les pièces justificatives ci-dessous.
           </p>
         </div>
       </motion.div>
@@ -391,12 +514,20 @@ export default function LetterPreview({ data, onBack }) {
           <ArrowLeft className="w-4 h-4" />
           Modifier le formulaire
         </motion.button>
-        <DownloadButton
-          onClick={() => { handleFirstDownload(); return downloadDocx(data) }}
-          icon={FileText}
-          label="Télécharger DOCX"
-          className="bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] focus-visible:ring-[var(--accent)]"
-        />
+        <div className="flex gap-2">
+          <DownloadButton
+            onClick={() => { handleFirstDownload(); return downloadDocx(data, 'fr') }}
+            icon={FileText}
+            label="DOCX Français"
+            className="bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] focus-visible:ring-[var(--accent)]"
+          />
+          <DownloadButton
+            onClick={() => { handleFirstDownload(); return downloadDocx(data, 'en') }}
+            icon={FileText}
+            label="DOCX English"
+            className="bg-[var(--accent-dark)] text-white hover:bg-[var(--accent-dark-hover)] focus-visible:ring-[var(--accent-dark)]"
+          />
+        </div>
       </motion.div>
 
       <OrnamentalDivider className="max-w-xs mx-auto" />

@@ -257,9 +257,15 @@ function App() {
   const [formData, setFormData] = useState(null)
   const [theme, setTheme] = useState(() => {
     try {
-      const saved = localStorage.getItem('wedding-theme') || 'sand'
-      document.documentElement.setAttribute('data-theme', saved)
-      return saved
+      const saved = localStorage.getItem('wedding-theme')
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved)
+        return saved
+      }
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const initial = prefersDark ? 'snow' : 'sand'
+      document.documentElement.setAttribute('data-theme', initial)
+      return initial
     } catch { return 'sand' }
   })
 
@@ -420,12 +426,15 @@ function App() {
               transition={{ delay: 5.2, duration: 0.6 }}
               className="mt-6"
             >
-              <motion.div
+              <motion.button
+                onClick={scrollToForm}
                 animate={{ y: [0, 8, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="cursor-pointer"
+                aria-label="Défiler vers le formulaire"
               >
                 <ChevronDown className="w-5 h-5 mx-auto" style={{ color: t.heroGhost }} />
-              </motion.div>
+              </motion.button>
             </motion.div>
           </motion.div>
         </section>
