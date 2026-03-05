@@ -779,6 +779,23 @@ export default function LetterPreview({ data, onBack, isEntering, onEnterComplet
                 </span>
               </div>
             </a>
+            <a
+              href="https://www.facebook.com/groups/2386718511610313/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[var(--border-20)]
+                hover:bg-[var(--accent-5)] transition-colors duration-200 group"
+            >
+              <ExternalLink className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
+              <div>
+                <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors duration-200 block">
+                  Visa Canada — Facebook
+                </span>
+                <span className="text-xs text-[var(--text-muted-70)]">
+                  Groupe d{'\u2019'}entraide pour les demandes de visa canadien
+                </span>
+              </div>
+            </a>
           </div>
         </div>
       </motion.div>
